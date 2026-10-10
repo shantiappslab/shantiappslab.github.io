@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "developer_url": "https://play.google.com/store/apps/developer?id=Shanti+Lab",
+  "games": [
+    {
+      "title": "Blobby Forest",
+      "package": "com.shantiappslab.blobbyforest",
+      "icon": "games/icons/blobbyforest.png",
+      "tagline": {"en": "Drop and merge cute forest monsters!", "es": "¡Suelta y fusiona monstruos del bosque!"}
+    },
+    {
+      "title": "FrostCamel",
+      "package": "com.shantiappslab.frostcamel",
+      "icon": "games/icons/frostcamel.png",
+      "tagline": {"en": "Slingshot a freezing camel to the campfire!", "es": "¡Lanza a un camello helado hasta la hoguera!"}
+    }
+  ]
+}
