@@ -13,6 +13,12 @@
       "package": "com.shantiappslab.frostcamel",
       "icon": "games/icons/frostcamel.png",
       "tagline": {"en": "Slingshot a freezing camel to the campfire!", "es": "¡Lanza a un camello helado hasta la hoguera!"}
+    },
+    {
+      "title": "Blobby Jars",
+      "package": "com.shantiappslab.blobbyjars",
+      "icon": "games/icons/blobbyjars.png",
+      "tagline": {"en": "Sort cute forest monsters into their jars!", "es": "¡Ordena monstruitos del bosque en sus tarros!"}
     }
   ]
 }
