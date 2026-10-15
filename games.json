@@ -24,7 +24,7 @@
       "title": "Blobby Escape",
       "package": "com.shantiappslab.blobbyescape",
       "icon": "games/icons/blobbyescape.png",
-      "tagline": {"en": "Free the monsters and save the queen from the sharks!", "es": "¡Libera a los monstruos y salva a la reina de los tiburones!"}
+      "tagline": {"en": "Free the Blobbies and save the queen from the sharks!", "es": "¡Libera a los Blobbies y salva a la reina de los tiburones!"}
     }
   ]
 }
