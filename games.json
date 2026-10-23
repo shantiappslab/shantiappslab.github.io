@@ -25,6 +25,18 @@
       "package": "com.shantiappslab.blobbyescape",
       "icon": "games/icons/blobbyescape.png",
       "tagline": {"en": "Free the Blobbies and save the queen from the sharks!", "es": "¡Libera a los Blobbies y salva a la reina de los tiburones!"}
+    },
+    {
+      "title": "Word Search Road Trip",
+      "package": "com.shantiappslab.wordsearchroadtrip",
+      "icon": "games/icons/wordsearchroadtrip.png",
+      "tagline": {"en": "Relaxing word searches along Route 66!", "es": "¡Sopas de letras relajantes por la Ruta 66!"}
+    },
+    {
+      "title": "Blobby Blocks",
+      "package": "com.shantiappslab.blobbyblocks",
+      "icon": "games/icons/blobbyblocks.png",
+      "tagline": {"en": "Rotate jelly Blobby blocks and clear lines!", "es": "¡Gira bloques de gelatina Blobby y limpia líneas!"}
     }
   ]
 }
