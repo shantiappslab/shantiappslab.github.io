@@ -1,0 +1,55 @@
+# Lluvia y temperatura por comarca para la app «Setas de España» (datos de AEMET OpenData).
+# Cada 6 horas actualiza setas/meteo.json; la app lo descarga de raw.githubusercontent.com.
+# La clave de AEMET va en Settings → Secrets and variables → Actions → AEMET_API_KEY (caduca a los 3 meses).
+# Las observaciones horarias acumuladas (setas/estado_obs.json) se guardan en la caché de Actions, no en git,
+# para no engordar el repositorio con un commit grande cada 6 horas.
+name: Setas - datos de AEMET
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: setas-meteo
+  cancel-in-progress: false
+
+jobs:
+  meteo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recuperar las observaciones acumuladas
+        uses: actions/cache/restore@v4
+        with:
+          path: setas/estado_obs.json
+          key: setas-obs-${{ github.run_id }}
+          restore-keys: setas-obs-
+      - name: Descargar y resumir los datos de AEMET
+        env:
+          AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
+        run: python3 setas/meteo_aemet.py
+      - name: Guardar las observaciones acumuladas
+        uses: actions/cache/save@v4
+        with:
+          path: setas/estado_obs.json
+          key: setas-obs-${{ github.run_id }}
+      - name: Publicar meteo.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add setas/meteo.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+          else
+            git commit -m "Setas: datos de AEMET $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase
+            git push
+          fi
