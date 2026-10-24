@@ -62,9 +62,7 @@ def main():
         return
     cuerpo = PROCEDIMIENTO.format(caduca=fin.strftime("%d-%m-%Y") if fin else "(desconocida)", dias=texto_dias)
     if prueba:
-        cuerpo = "**Esto es una PRUEBA del aviso: no hace falta renovar nada todavía. Ciérralo.**
-
-" + cuerpo
+        cuerpo = "**Esto es una PRUEBA del aviso: no hace falta renovar nada todavía. Ciérralo.**\n\n" + cuerpo
     print(gh("issue", "create", "--repo", repo, "--title", titulo, "--body", cuerpo, "--assignee", "shantiappslab"))
 
 
