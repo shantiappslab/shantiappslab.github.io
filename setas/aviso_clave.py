@@ -3,7 +3,8 @@
 Las claves de AEMET OpenData caducan a los ~3 meses. La fecha va dentro de la propia clave (JWT, campo «exp»), así
 que este aviso sirve también para las claves futuras sin tocar nada. Si faltan 15 días o menos (o la clave falta o
 no se puede leer), abre un aviso (issue) en el repositorio con el procedimiento; GitHub lo envía por correo.
-No abre un segundo aviso si ya hay uno abierto. Variables: AEMET_API_KEY, GH_TOKEN, GITHUB_REPOSITORY.
+No abre un segundo aviso si ya hay uno abierto. Variables: AEMET_API_KEY, GH_TOKEN, GITHUB_REPOSITORY y AVISO_PRUEBA
+(«1» = abre siempre el aviso con «(prueba)» en el título, para comprobar que el correo llega; Run workflow → prueba).
 """
 import base64
 import datetime as dt
@@ -49,16 +50,22 @@ def main():
     except Exception:  # noqa: BLE001
         fin, dias, texto_dias = None, -1, "no se ha podido leer la clave: falta o no es válida"
         print("No se puede leer la caducidad de la clave de AEMET")
-    if dias > DIAS_AVISO:
+    prueba = os.environ.get("AVISO_PRUEBA") == "1"
+    if dias > DIAS_AVISO and not prueba:
         return
+    titulo = TITULO + (" (prueba)" if prueba else "")
     repo = os.environ["GITHUB_REPOSITORY"]
-    abiertos = json.loads(gh("issue", "list", "--repo", repo, "--state", "open", "--search", TITULO + " in:title",
-                             "--json", "number"))
+    abiertos = [i for i in json.loads(gh("issue", "list", "--repo", repo, "--state", "open", "--search",
+                                         TITULO + " in:title", "--json", "number,title")) if i["title"] == titulo]
     if abiertos:
         print("Ya hay un aviso abierto: #%d" % abiertos[0]["number"])
         return
     cuerpo = PROCEDIMIENTO.format(caduca=fin.strftime("%d-%m-%Y") if fin else "(desconocida)", dias=texto_dias)
-    print(gh("issue", "create", "--repo", repo, "--title", TITULO, "--body", cuerpo, "--assignee", "shantiappslab"))
+    if prueba:
+        cuerpo = "**Esto es una PRUEBA del aviso: no hace falta renovar nada todavía. Ciérralo.**
+
+" + cuerpo
+    print(gh("issue", "create", "--repo", repo, "--title", titulo, "--body", cuerpo, "--assignee", "shantiappslab"))
 
 
 if __name__ == "__main__":

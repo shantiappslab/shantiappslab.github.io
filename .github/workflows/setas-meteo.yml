@@ -10,6 +10,11 @@ on:
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:
+    inputs:
+      prueba_aviso:
+        description: "Abrir un aviso de PRUEBA de caducidad de la clave (para comprobar que llega el correo)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -32,6 +37,7 @@ jobs:
         env:
           AEMET_API_KEY: ${{ secrets.AEMET_API_KEY }}
           GH_TOKEN: ${{ github.token }}
+          AVISO_PRUEBA: ${{ inputs.prueba_aviso && '1' || '' }}
         run: python3 setas/aviso_clave.py
       - name: Recuperar las observaciones acumuladas
         uses: actions/cache/restore@v4
