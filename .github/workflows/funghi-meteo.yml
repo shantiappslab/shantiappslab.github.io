@@ -1,0 +1,53 @@
+# Lluvia y temperatura por zona para la app «Funghi d'Italia» (datos de MeteoHub, Agenzia ItaliaMeteo, CC BY 4.0).
+# Cada 6 horas actualiza funghi/meteo.json; la app lo descarga de raw.githubusercontent.com.
+# MeteoHub no necesita clave, pero sin cuenta solo da los últimos días: el historial se acumula en
+# funghi/estado_meteohub.json, que se guarda en la caché de Actions (no en git, para no engordar el repositorio).
+# Si la caché se pierde, la tarea sigue funcionando y el historial se rehace en 15 días.
+name: Funghi - datos de MeteoHub
+
+on:
+  schedule:
+    - cron: "41 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: funghi-meteo
+  cancel-in-progress: false
+
+jobs:
+  meteo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recuperar el historial acumulado
+        uses: actions/cache/restore@v4
+        with:
+          path: funghi/estado_meteohub.json
+          key: funghi-meteohub-${{ github.run_id }}
+          restore-keys: funghi-meteohub-
+      - name: Descargar y resumir los datos de MeteoHub
+        run: python3 funghi/meteo_meteohub.py
+      - name: Guardar el historial acumulado
+        uses: actions/cache/save@v4
+        with:
+          path: funghi/estado_meteohub.json
+          key: funghi-meteohub-${{ github.run_id }}
+      - name: Publicar meteo.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add funghi/meteo.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+          else
+            git commit -m "Funghi: datos de MeteoHub $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase
+            git push
+          fi
