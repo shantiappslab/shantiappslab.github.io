@@ -1,0 +1,40 @@
+# Lluvia y temperatura por comarca para la app «Bolets de Catalunya» (datos abiertos del Meteocat, sin clave).
+# Cada 6 horas actualiza bolets/meteo.json; la app lo descarga de raw.githubusercontent.com.
+# Las comarcas (id, nombre ICGC y centro) están en bolets/comarques_meteo.json, generado en BoletsApps.
+name: Bolets - datos del Meteocat
+
+on:
+  schedule:
+    - cron: "29 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bolets-meteo
+  cancel-in-progress: false
+
+jobs:
+  meteo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Descargar y resumir los datos del Meteocat
+        run: python3 bolets/meteo_meteocat.py
+      - name: Publicar meteo.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bolets/meteo.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+          else
+            git commit -m "Bolets: datos del Meteocat $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase
+            git push
+          fi

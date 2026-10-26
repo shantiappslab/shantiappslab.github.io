@@ -1,0 +1,260 @@
+[
+ {
+  "id": "altcamp",
+  "nom": "Alt Camp",
+  "lat": 41.3388,
+  "lon": 1.28995
+ },
+ {
+  "id": "altemporda",
+  "nom": "Alt Empordà",
+  "lat": 42.28965,
+  "lon": 2.93325
+ },
+ {
+  "id": "altpenedes",
+  "nom": "Alt Penedès",
+  "lat": 41.368449999999996,
+  "lon": 1.6858
+ },
+ {
+  "id": "alturgell",
+  "nom": "Alt Urgell",
+  "lat": 42.24145,
+  "lon": 1.4083999999999999
+ },
+ {
+  "id": "altaribagorca",
+  "nom": "Alta Ribagorça",
+  "lat": 42.465149999999994,
+  "lon": 0.8314
+ },
+ {
+  "id": "anoia",
+  "nom": "Anoia",
+  "lat": 41.61525,
+  "lon": 1.608
+ },
+ {
+  "id": "bages",
+  "nom": "Bages",
+  "lat": 41.78055,
+  "lon": 1.7995
+ },
+ {
+  "id": "baixcamp",
+  "nom": "Baix Camp",
+  "lat": 41.143950000000004,
+  "lon": 0.9829000000000001
+ },
+ {
+  "id": "baixebre",
+  "nom": "Baix Ebre",
+  "lat": 40.8546,
+  "lon": 0.55365
+ },
+ {
+  "id": "baixemporda",
+  "nom": "Baix Empordà",
+  "lat": 41.9468,
+  "lon": 3.0595999999999997
+ },
+ {
+  "id": "baixllobregat",
+  "nom": "Baix Llobregat",
+  "lat": 41.433499999999995,
+  "lon": 1.9810499999999998
+ },
+ {
+  "id": "baixpenedes",
+  "nom": "Baix Penedès",
+  "lat": 41.279250000000005,
+  "lon": 1.5218500000000001
+ },
+ {
+  "id": "barcelones",
+  "nom": "Barcelonès",
+  "lat": 41.40475,
+  "lon": 2.16115
+ },
+ {
+  "id": "bergueda",
+  "nom": "Berguedà",
+  "lat": 42.110299999999995,
+  "lon": 1.84035
+ },
+ {
+  "id": "cerdanya",
+  "nom": "Cerdanya",
+  "lat": 42.39215,
+  "lon": 1.7984999999999998
+ },
+ {
+  "id": "concadebarbera",
+  "nom": "Conca de Barberà",
+  "lat": 41.4443,
+  "lon": 1.19025
+ },
+ {
+  "id": "garraf",
+  "nom": "Garraf",
+  "lat": 41.2608,
+  "lon": 1.7927
+ },
+ {
+  "id": "garrigues",
+  "nom": "Garrigues",
+  "lat": 41.43985,
+  "lon": 0.82795
+ },
+ {
+  "id": "garrotxa",
+  "nom": "Garrotxa",
+  "lat": 42.17295,
+  "lon": 2.55595
+ },
+ {
+  "id": "girones",
+  "nom": "Gironès",
+  "lat": 41.93715,
+  "lon": 2.8089500000000003
+ },
+ {
+  "id": "llucanes",
+  "nom": "Lluçanès",
+  "lat": 42.02095,
+  "lon": 2.0928
+ },
+ {
+  "id": "maresme",
+  "nom": "Maresme",
+  "lat": 41.6025,
+  "lon": 2.5121
+ },
+ {
+  "id": "moianes",
+  "nom": "Moianès",
+  "lat": 41.80915,
+  "lon": 2.0739
+ },
+ {
+  "id": "montsia",
+  "nom": "Montsià",
+  "lat": 40.65265,
+  "lon": 0.5166499999999999
+ },
+ {
+  "id": "noguera",
+  "nom": "Noguera",
+  "lat": 41.9043,
+  "lon": 0.9373499999999999
+ },
+ {
+  "id": "osona",
+  "nom": "Osona",
+  "lat": 41.951499999999996,
+  "lon": 2.29825
+ },
+ {
+  "id": "pallarsjussa",
+  "nom": "Pallars Jussà",
+  "lat": 42.280249999999995,
+  "lon": 0.9334
+ },
+ {
+  "id": "pallarssobira",
+  "nom": "Pallars Sobirà",
+  "lat": 42.5237,
+  "lon": 1.19075
+ },
+ {
+  "id": "pladurgell",
+  "nom": "Pla d'Urgell",
+  "lat": 41.6451,
+  "lon": 0.9146000000000001
+ },
+ {
+  "id": "pladelestany",
+  "nom": "Pla de l'Estany",
+  "lat": 42.122,
+  "lon": 2.7702999999999998
+ },
+ {
+  "id": "priorat",
+  "nom": "Priorat",
+  "lat": 41.21455,
+  "lon": 0.81735
+ },
+ {
+  "id": "riberadebre",
+  "nom": "Ribera d'Ebre",
+  "lat": 41.1327,
+  "lon": 0.6198
+ },
+ {
+  "id": "ripolles",
+  "nom": "Ripollès",
+  "lat": 42.2724,
+  "lon": 2.2566
+ },
+ {
+  "id": "segarra",
+  "nom": "Segarra",
+  "lat": 41.7398,
+  "lon": 1.3037
+ },
+ {
+  "id": "segria",
+  "nom": "Segrià",
+  "lat": 41.564049999999995,
+  "lon": 0.56835
+ },
+ {
+  "id": "selva",
+  "nom": "Selva",
+  "lat": 41.854699999999994,
+  "lon": 2.68935
+ },
+ {
+  "id": "solsones",
+  "nom": "Solsonès",
+  "lat": 41.981300000000005,
+  "lon": 1.5143
+ },
+ {
+  "id": "tarragones",
+  "nom": "Tarragonès",
+  "lat": 41.154650000000004,
+  "lon": 1.2948
+ },
+ {
+  "id": "terraalta",
+  "nom": "Terra Alta",
+  "lat": 41.027150000000006,
+  "lon": 0.38555
+ },
+ {
+  "id": "urgell",
+  "nom": "Urgell",
+  "lat": 41.66275,
+  "lon": 1.08615
+ },
+ {
+  "id": "valdaran",
+  "nom": "Val d'Aran",
+  "lat": 42.725350000000006,
+  "lon": 0.8382499999999999
+ },
+ {
+  "id": "vallesoccidental",
+  "nom": "Vallès Occidental",
+  "lat": 41.5664,
+  "lon": 2.04275
+ },
+ {
+  "id": "vallesoriental",
+  "nom": "Vallès Oriental",
+  "lat": 41.6487,
+  "lon": 2.35255
+ }
+]
