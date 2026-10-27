@@ -1,0 +1,100 @@
+/* Webs de les apps de bolets (generador/genera.py): l'aspecte de l'app i del quadern. Títols amb Fredoka, la lletra
+   del logotip de l'app (llicència OFL, fredoka-OFL.txt). */
+@font-face { font-family: "Fredoka"; src: url("fredoka.ttf") format("truetype"); font-weight: 300 700; font-display: swap; }
+:root {
+  --verd: #2f6b1f; --verd-clar: #b4f094; --fons: #f8f5ee; --paper: #fbf6e8; --ratlla: #e7ddc5; --marge: #d0574b55;
+  --tinta: #3a2f1f; --suau: #6b5d45; --posit: #fff1a8; --comestible: #2e7d32; --toxic: #c62828; --mortal: #4a0d0d;
+  --pluja: #2f6fb3; --bosc: #b9d99a; --terra: #ece6d6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fons); color: var(--tinta); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--verd); }
+img { max-width: 100%; height: auto; display: block; }
+.cap { background: var(--verd); color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; }
+.cap a { color: #fff; text-decoration: none; }
+.marca { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; }
+.marca img { border-radius: 50%; background: #fff; }
+.cap nav a { font-size: 15px; border: 1px solid #ffffff88; border-radius: 16px; padding: 3px 12px; }
+main { max-width: 760px; margin: 0 auto; padding: 8px 16px 24px; }
+h1 { font-family: "Fredoka", system-ui, sans-serif; font-weight: 600; font-size: 34px; line-height: 1.15; margin: 18px 0 6px; }
+h2 { font-family: "Fredoka", system-ui, sans-serif; font-weight: 600; font-size: 24px; line-height: 1.2; margin: 0 0 10px; color: var(--verd); }
+h3 { font-size: 18px; margin: 16px 0 8px; }
+.molles { font-size: 14px; margin: 10px 0 0; color: var(--suau); }
+.cientific { margin: 0; color: var(--suau); font-size: 18px; }
+.altres, .data { color: var(--suau); margin: 4px 0 12px; font-size: 15px; }
+.tox { display: inline-block; font-style: normal; font-size: 13px; font-weight: 700; color: #fff; border-radius: 10px; padding: 1px 9px; vertical-align: middle; }
+.tox.comestible { background: var(--comestible); } .tox.toxic { background: var(--toxic); } .tox.mortal { background: var(--mortal); }
+.avis { background: #fde7e4; border-left: 5px solid var(--toxic); padding: 10px 14px; border-radius: 6px; font-weight: 600; }
+section { margin: 22px 0; }
+.paper { background: var(--paper); border-radius: 6px; padding: 16px 18px 12px 30px; box-shadow: 0 2px 8px #3a2f1f1f;
+  background-image: linear-gradient(90deg, transparent 18px, var(--marge) 18px, var(--marge) 20px, transparent 20px),
+    repeating-linear-gradient(transparent 0 30px, var(--ratlla) 30px 31px); }
+.paper ol, .paper ul { padding-left: 20px; margin: 0 0 8px; }
+.posit { background: var(--posit); padding: 14px 18px; transform: rotate(-.6deg); box-shadow: 0 4px 10px #3a2f1f26; }
+.posit h2 { color: #b5453a; }
+figure { margin: 14px 0; }
+figure img { border-radius: 8px; }
+figcaption { font-size: 12px; color: var(--suau); margin-top: 4px; overflow-wrap: anywhere; }
+figcaption a { color: var(--suau); }
+.foto img { width: 100%; max-height: 520px; object-fit: cover; }
+.galeria { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.varietat { border-top: 1px solid var(--ratlla); padding-top: 10px; margin-top: 10px; }
+.varietat .petita { float: right; width: 38%; margin: 0 0 8px 12px; }
+.varietat::after { content: ""; display: block; clear: both; }
+.varietat .habitat { font-size: 15px; color: var(--suau); }
+.mesos { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; text-align: center; font-weight: 700; font-size: 14px; }
+.mesos span { padding: 6px 0; border-radius: 4px; background: var(--terra); color: #9a8f7a; }
+.mesos .si { background: #cfe7bd; color: var(--tinta); } .mesos .millor { background: var(--verd); color: #fff; }
+.llegenda { font-size: 14px; color: var(--suau); }
+.llegenda span { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin: 0 4px 0 10px; }
+.llegenda .si { background: #cfe7bd; } .llegenda .millor { background: var(--verd); }
+.graella { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.targeta { display: flex; gap: 10px; align-items: center; background: #fff; border-radius: 10px; padding: 8px; text-decoration: none; color: var(--tinta); box-shadow: 0 1px 4px #3a2f1f1f; }
+.targeta img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; flex: none; }
+.targeta b { display: block; } .targeta i { display: block; font-size: 13px; color: var(--suau); margin-bottom: 3px; }
+.resum { font-size: 20px; font-weight: 600; }
+.mapa svg { width: 100%; height: auto; background: #fff; border-radius: 10px; }
+.mapa path { stroke: #fff; stroke-width: 1; fill-rule: evenodd; }
+.mapa .terra { fill: var(--terra); } .mapa .bosc { fill: var(--bosc); } .mapa .pluja { fill: var(--pluja); }
+.mapa .num circle { fill: #fff; stroke: var(--pluja); stroke-width: 2; }
+.mapa .num text { font: 700 13px system-ui, sans-serif; text-anchor: middle; fill: var(--pluja); }
+.mapa figcaption span { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin: 0 4px 0 10px; }
+.mapa figcaption .pluja { background: var(--pluja); } .mapa figcaption .bosc { background: var(--bosc); }
+.ranquing li { margin: 2px 0; } .ranquing span { color: var(--pluja); font-weight: 700; }
+.enllacos { display: flex; flex-wrap: wrap; gap: 10px; }
+.enllacos a { background: #fff; border-radius: 12px; padding: 10px 14px; text-decoration: none; font-weight: 600; box-shadow: 0 1px 4px #3a2f1f1f; }
+.seguretat { background: #fff4d6; border-radius: 10px; padding: 12px 14px; font-weight: 600; font-size: 15px; }
+.fonts { font-size: 14px; } .fonts h2 { font-size: 20px; }
+.mesos-text { font-size: 15px; color: var(--suau); }
+/* Targeta gran per descarregar l'app, a dalt de cada pàgina */
+.baixa { display: grid; grid-template-columns: 72px 1fr; gap: 6px 14px; align-items: center; background: #fff;
+  border: 3px solid var(--verd); border-radius: 18px; padding: 16px; margin: 18px 0; box-shadow: 0 6px 18px #2f6b1f2e; }
+.baixa img { border-radius: 18px; grid-row: span 2; }
+.baixa b { font-family: "Fredoka", system-ui, sans-serif; font-weight: 600; font-size: 21px; color: var(--verd); line-height: 1.2; }
+.baixa p { margin: 0; font-size: 15px; color: var(--suau); }
+.baixa .gran { grid-column: 1 / -1; display: block; text-align: center; background: var(--verd); color: #fff; text-decoration: none;
+  font-weight: 700; font-size: 20px; border-radius: 14px; padding: 16px; margin-top: 8px; }
+.baixa .gran small { display: block; font-weight: 400; font-size: 13px; opacity: .9; }
+footer { background: #ece6d6; color: var(--suau); font-size: 14px; padding: 16px; text-align: center; }
+footer p { max-width: 760px; margin: 6px auto; }
+@media (min-width: 700px) { h1 { font-size: 42px; } .galeria { grid-template-columns: 1fr 1fr 1fr; } }
+/* Capçalera amb la il·lustració d'un bosc (aquarel·la de l'app) i polaroids amb fotos reals */
+.heroi { margin: 8px -8px 0; text-align: center; }
+.heroi .il-lustracio { width: 100%; max-width: 760px; margin: 0 auto; }
+.heroi.amb-fotos .il-lustracio { margin-bottom: -70px; }
+.polaroids { display: flex; justify-content: center; gap: 2%; padding: 0 8px; position: relative; }
+.polaroid { width: 23%; max-width: 150px; background: #fff; padding: 5px 5px 0; box-shadow: 0 4px 12px #3a2f1f40;
+  text-decoration: none; color: var(--tinta); transition: transform .2s; }
+.polaroid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 2px; }
+.polaroid span { display: block; font-family: "Fredoka", system-ui, sans-serif; font-weight: 500; font-size: 14px; padding: 4px 0 6px; }
+.polaroid.p0 { transform: rotate(-5deg) translateY(6px); } .polaroid.p1 { transform: rotate(3deg); }
+.polaroid.p2 { transform: rotate(-2deg) translateY(4px); } .polaroid.p3 { transform: rotate(5deg); }
+.polaroid:hover { transform: rotate(0) scale(1.05); }
+.credits-heroi { font-size: 11px; color: var(--suau); margin: 10px 8px 0; }
+.habitat-bosc { display: flex; gap: 12px; align-items: center; margin: 8px 0; }
+.habitat-bosc .il-lustracio { width: 42%; max-width: 220px; flex: none; }
+.habitat-bosc p { margin: 0; }
+@media (min-width: 700px) { .polaroid span { font-size: 16px; } .heroi.amb-fotos .il-lustracio { margin-bottom: -110px; } }
+/* Les vores de l'aquarel·la es difuminen amb el fons, sigui el de la pàgina o el del paper de la llibreta */
+.il-lustracio { -webkit-mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent);
+  mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent); }
