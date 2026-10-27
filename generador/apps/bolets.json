@@ -120,7 +120,8 @@
    "altitud_titol": "Altitud",
    "altitud_alt": "Muntanya amb la franja d'altitud on surt: de {min} a {max} m",
    "micolegs_titol": "Què diuen els micòlegs aquesta setmana",
-   "micolegs_peu": "Resum automàtic de fonts públiques, sempre amb l'enllaç a l'original. A l'app, amb la Temporada, el butlletí complet i avisos de les teves comarques."
+   "micolegs_peu": "Resum automàtic de fonts públiques, sempre amb l'enllaç a l'original. A l'app, amb la Temporada, el butlletí complet i avisos de les teves comarques.",
+   "videos_titol": "Com funciona l'app"
   },
   "es": {
    "lang": "es",
@@ -233,7 +234,8 @@
    "altitud_titol": "Altitud",
    "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m",
    "micolegs_titol": "Qué dicen los micólogos esta semana",
-   "micolegs_peu": "Resumen automático de fuentes públicas, siempre con el enlace al original. En la app, con Temporada, el parte completo y avisos de tus comarcas."
+   "micolegs_peu": "Resumen automático de fuentes públicas, siempre con el enlace al original. En la app, con Temporada, el parte completo y avisos de tus comarcas.",
+   "videos_titol": "Cómo funciona la app"
   }
  },
  "heroi": {
@@ -246,5 +248,31 @@
   ],
   "comestibles": "castanyeda",
   "toxics": "avetosa"
+ },
+ "videos": {
+  "ca": [
+   {
+    "id": "nB7uEw1Qums",
+    "titol": "El mapa: on estan sortint bolets i com es calcula la probabilitat"
+   },
+   {
+    "id": "YMG-LHYaBSY",
+    "titol": "Totes les funcions: mapa, fitxes, quadern, receptes i joc"
+   }
+  ],
+  "es": [
+   {
+    "id": "xt-Qj3AP3fA",
+    "titol": "Presentación de la app"
+   },
+   {
+    "id": "nB7uEw1Qums",
+    "titol": "El mapa: dónde salen setas y cómo se calcula la probabilidad (en catalán)"
+   },
+   {
+    "id": "YMG-LHYaBSY",
+    "titol": "Todas las funciones de la app (en catalán)"
+   }
+  ]
  }
 }

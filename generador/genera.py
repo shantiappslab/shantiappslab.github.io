@@ -351,6 +351,7 @@ class Web:
         if not any('class="baixa"' in p for p in parts):
             parts.append(self.baixa(idioma, "portada"))
         parts.append(self.nota_micologica(idioma, avui))
+        parts.append(self.videos(idioma))
         mes = avui.month
         millors = [b for b in self.bolets.values() if b.get("camp") and mes in b["camp"]["millors"]]
         tambe = [b for b in self.bolets.values() if b.get("camp") and mes in b["camp"]["mesos"] and b not in millors]
@@ -374,6 +375,26 @@ class Web:
                "publisher": {"@type": "Organization", "name": "Shanti Apps Lab"}}
         return self.pagina(idioma, self.base(idioma), t["titol_portada"], t["portada_desc"],
                            "\n".join(parts), {i: self.base(i) for i in self.idiomes}, "portada", dades=[app])
+
+    def videos(self, idioma):
+        """«Com funciona l'app»: vídeos de YouTube de la configuració ("videos": {idioma: [{"id", "titol"}]}).
+        Es mostra la miniatura i el vídeo (youtube-nocookie) només es carrega quan es toca: sense galetes de YouTube
+        fins que el visitant decideix veure'l."""
+        llista = self.cfg.get("videos", {}).get(idioma) or []
+        if not llista:
+            return ""
+        t = self.cfg["textos"][idioma]
+        targetes = "".join(
+            f'<figure class="video"><a href="https://www.youtube.com/watch?v={e(v["id"])}" data-video="{e(v["id"])}" '
+            f'aria-label="{e(v["titol"])}"><img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" loading="lazy" '
+            f'width="480" height="360" alt=""><span class="play" aria-hidden="true"></span></a>'
+            f'<figcaption>{e(v["titol"])}</figcaption></figure>' for v in llista)
+        script = ("<script>document.querySelectorAll('a[data-video]').forEach(function(a){a.addEventListener('click',"
+                  "function(ev){ev.preventDefault();var f=document.createElement('iframe');"
+                  "f.src='https://www.youtube-nocookie.com/embed/'+a.dataset.video+'?autoplay=1&rel=0';"
+                  "f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;"
+                  "f.title=a.getAttribute('aria-label');a.replaceWith(f);});});</script>")
+        return f'<section><h2>{e(t["videos_titol"])}</h2><div class="videos">{targetes}</div>{script}</section>'
 
     def nota_micologica(self, idioma, avui):
         """«Què diuen els micòlegs»: frases breus amb la font i l'enllaç; res si la nota té més de 10 dies."""

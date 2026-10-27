@@ -105,3 +105,10 @@ footer p { max-width: 760px; margin: 6px auto; }
 .muntanya .escala line { stroke: var(--tinta); stroke-width: 3; }
 .muntanya .escala text { font: 600 34px system-ui, sans-serif; fill: var(--tinta); }
 .muntanya .barra { stroke: var(--verd); stroke-width: 14; stroke-linecap: round; }
+.videos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.video { margin: 0; }
+.video a, .video iframe { display: block; position: relative; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 10px; overflow: hidden; background: #000; }
+.video img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
+.video .play { position: absolute; left: 50%; top: 50%; width: 68px; height: 48px; margin: -24px 0 0 -34px; border-radius: 12px; background: #c4302bdd; }
+.video .play::after { content: ""; position: absolute; left: 27px; top: 14px; border-style: solid; border-width: 10px 0 10px 17px; border-color: transparent transparent transparent #fff; }
+.video figcaption { font-size: .95rem; margin-top: 6px; }
