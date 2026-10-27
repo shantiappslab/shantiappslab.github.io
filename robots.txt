@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://shantiappslab.github.io/versant/sitemap.xml
