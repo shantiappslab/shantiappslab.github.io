@@ -98,3 +98,10 @@ footer p { max-width: 760px; margin: 6px auto; }
 /* Les vores de l'aquarel·la es difuminen amb el fons, sigui el de la pàgina o el del paper de la llibreta */
 .il-lustracio { -webkit-mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent);
   mask-image: radial-gradient(ellipse closest-side, #000 72%, transparent); }
+/* Altitud: la muntanya de l'app amb l'escala de metres i la franja de l'espècie */
+.altitud-xifra { font-family: "Fredoka", system-ui, sans-serif; font-weight: 600; font-size: 30px; color: var(--verd); margin: 0; }
+.muntanya { width: 100%; max-width: 520px; display: block; margin: 8px auto 0; }
+.muntanya .franja { fill: var(--verd); fill-opacity: .22; }
+.muntanya .escala line { stroke: var(--tinta); stroke-width: 3; }
+.muntanya .escala text { font: 600 34px system-ui, sans-serif; fill: var(--tinta); }
+.muntanya .barra { stroke: var(--verd); stroke-width: 14; stroke-linecap: round; }

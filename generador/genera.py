@@ -23,6 +23,10 @@ TOP_PLUJA = 5
 POCA_PLUJA = 15  # mm en 15 dies: per sota, la frase diu que ha plogut poc
 DIES_VELLS = 6  # si les dades del meteo tenen més dies, no es mostren
 TOX_ORDRE = {"mortal": 0, "toxic": 1, "comestible": 2}
+# Muntanya de l'altitud (bosc_muntanya.webp): altura del cim i del mar en fracció de la imatge i metres del cim (com l'app)
+MUNTANYA_CIM = 0.040
+MUNTANYA_MAR = 0.973
+ALTITUD_CIM = 3000
 LOCALE = {"ca": "ca_ES", "es": "es_ES", "it": "it_IT", "fr": "fr_FR", "de": "de_DE", "pt": "pt_PT"}
 
 
@@ -138,6 +142,30 @@ class Web:
         bosc_img = self.il_lustracio(bosc, t["bosc_alt"], 'fetchpriority="high"')
         return f'<div class="heroi{" amb-fotos" if polaroids else ""}">{bosc_img}{fotos}</div>'
 
+    def altitud(self, minim, maxim, idioma):
+        """Altitud com a la fitxa de camp de l'app: la muntanya dibuixada, l'escala de metres i la franja de l'espècie."""
+        t = self.cfg["textos"][idioma]
+        mil = lambda m: f"{m:,}".replace(",", ".")  # noqa: E731
+        f = self.dades.get("boscos", {}).get("muntanya")
+        text = f'<p class="altitud-xifra">{mil(minim)} – {mil(maxim)} m</p><p>{e(t["altitud"].format(min=mil(minim), max=mil(maxim)))}</p>'
+        if not f:
+            return f'<section class="paper"><h2>{e(t["altitud_titol"])}</h2>{text}</section>'
+        w, h = f["w"], f["h"]
+
+        def y(m):  # mateixes proporcions que l'app (FitxaCamp.kt): el cim és a 3.000 m
+            return round(h * (MUNTANYA_MAR - (MUNTANYA_MAR - MUNTANYA_CIM) * m / ALTITUD_CIM), 1)
+
+        xe = w + 18
+        escala = "".join(f'<line x1="{xe}" y1="{y(m)}" x2="{xe + 12}" y2="{y(m)}"/><text x="{xe + 20}" y="{y(m) + 12}">{mil(m)} m</text>'
+                         for m in range(0, ALTITUD_CIM + 1, 500))
+        svg = (f'<svg class="muntanya" viewBox="0 0 {w + 175} {h}" role="img" '
+               f'aria-label="{e(t["altitud_alt"].format(min=mil(minim), max=mil(maxim)))}">'
+               f'<image href="/{self.carpeta}/{f["fitxer"]}" width="{w}" height="{h}"/>'
+               f'<rect class="franja" x="0" y="{y(maxim)}" width="{w}" height="{round(y(minim) - y(maxim), 1)}"/>'
+               f'<g class="escala"><line x1="{xe}" y1="{y(0)}" x2="{xe}" y2="{y(ALTITUD_CIM)}"/>{escala}</g>'
+               f'<line class="barra" x1="{xe}" y1="{y(minim)}" x2="{xe}" y2="{y(maxim)}"/></svg>')
+        return f'<section class="paper"><h2>{e(t["altitud_titol"])}</h2>{text}{svg}</section>'
+
     def molles(self, passos):
         """Dades estructurades de les molles de pa: [(nom, ruta), ...]."""
         return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
@@ -215,11 +243,12 @@ class Web:
         parts.append(f'<section><h2>{e(t["descripcio"])}</h2>' + "".join(
             "<p>%s</p>" % e(p).replace("\n", "<br>") for p in paragrafs) + "</section>")
         if camp and camp["habitats"]:
-            alt = ('<p>%s</p>' % e(t["altitud"].format(min=camp["altitud"][0], max=camp["altitud"][1]))) if camp.get("altitud") else ""
             # Cada hàbitat amb la il·lustració del seu bosc, com a la fitxa de camp de l'app
             parts.append(f'<section class="paper"><h2>{e(t["habitat"])}</h2>' + "".join(
                 f'<div class="habitat-bosc">{self.il_lustracio(h.get("bosc"), t["il_lustracio"].format(nom=h["titol"][idioma]))}'
-                f'<p><b>{e(h["titol"][idioma])}</b>. {e(h["text"][idioma])}</p></div>' for h in camp["habitats"]) + f"{alt}</section>")
+                f'<p><b>{e(h["titol"][idioma])}</b>. {e(h["text"][idioma])}</p></div>' for h in camp["habitats"]) + "</section>")
+        if camp and camp.get("altitud"):
+            parts.append(self.altitud(camp["altitud"][0], camp["altitud"][1], idioma))
         if camp and camp["mesos"]:
             parts.append(f'<section><h2>{e(t["quan_surt"])}</h2>{self.mesos(camp["mesos"], camp["millors"], idioma)}</section>')
         if camp and camp["varietats"]:

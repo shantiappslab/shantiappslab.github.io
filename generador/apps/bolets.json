@@ -85,7 +85,7 @@
    "es_confon": "Es pot confondre amb",
    "descripcio": "Descripció",
    "habitat": "Hàbitat: on el trobaràs",
-   "altitud": "Altitud: de {min} a {max} m",
+   "altitud": "Surt de {min} a {max} m d'altitud.",
    "quan_surt": "Quan surt",
    "temporada": "Temporada",
    "millors_mesos": "Els millors mesos",
@@ -116,7 +116,9 @@
    "app_descripcio": "Guia de bolets de Catalunya per a Android: fitxes de bolets comestibles, tòxics i mortals amb fotos reals, mapa d'on surten bolets, receptes i quadern de sortides. Funciona sense connexió.",
    "il_lustracio": "Il·lustració: {nom}",
    "bosc_alt": "Il·lustració d'un bosc de Catalunya a la tardor",
-   "fotos_credits": "Fotos: {credits} (Wikimedia Commons)."
+   "fotos_credits": "Fotos: {credits} (Wikimedia Commons).",
+   "altitud_titol": "Altitud",
+   "altitud_alt": "Muntanya amb la franja d'altitud on surt: de {min} a {max} m"
   },
   "es": {
    "lang": "es",
@@ -194,7 +196,7 @@
    "es_confon": "Se puede confundir con",
    "descripcio": "Descripción",
    "habitat": "Hábitat: dónde la encontrarás",
-   "altitud": "Altitud: de {min} a {max} m",
+   "altitud": "Sale de {min} a {max} m de altitud.",
    "quan_surt": "Cuándo sale",
    "temporada": "Temporada",
    "millors_mesos": "Los mejores meses",
@@ -225,7 +227,9 @@
    "app_descripcio": "Guía de setas de Cataluña para Android: fichas de setas comestibles, tóxicas y mortales con fotos reales, mapa de dónde salen setas, recetas y cuaderno de salidas. Funciona sin conexión.",
    "il_lustracio": "Ilustración: {nom}",
    "bosc_alt": "Ilustración de un bosque de Cataluña en otoño",
-   "fotos_credits": "Fotos: {credits} (Wikimedia Commons)."
+   "fotos_credits": "Fotos: {credits} (Wikimedia Commons).",
+   "altitud_titol": "Altitud",
+   "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m"
   }
  },
  "heroi": {
