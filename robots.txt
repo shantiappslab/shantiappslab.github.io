@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://shantiappslab.github.io/versant/sitemap.xml
 Sitemap: https://shantiappslab.github.io/bolets/sitemap.xml
