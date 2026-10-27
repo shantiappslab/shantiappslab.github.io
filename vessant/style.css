@@ -10,10 +10,9 @@ h3{font-size:17px;margin:20px 0 8px}
 .cap{background:var(--nit)}
 .cap .amplada{display:flex;align-items:center;justify-content:space-between;min-height:60px}
 .marca{display:flex;align-items:center;gap:10px;text-decoration:none}
-.rajola{display:flex;background:#fff;border-radius:8px;padding:5px 5px;flex-shrink:0}
-.simbol{width:30px;height:auto;flex-shrink:0}
+.simbol{width:40px;height:auto;flex-shrink:0}
 .paraula{height:26px;width:auto}
-@media (max-width:420px){.paraula{height:21px}.simbol{width:26px}.rajola{padding:4px}}
+@media (max-width:420px){.paraula{height:22px}.marca .simbol{width:34px}}
 .menu a{color:var(--gel);text-decoration:none;font-weight:600;padding:12px 4px}
 .molles{font-size:14px;color:var(--suau);margin-top:16px}
 section{background:#fff;border-radius:18px;padding:20px;margin:16px 0}
