@@ -3,3 +3,6 @@ Allow: /
 
 Sitemap: https://shantiappslab.github.io/versant/sitemap.xml
 Sitemap: https://shantiappslab.github.io/bolets/sitemap.xml
+Sitemap: https://shantiappslab.github.io/setas/sitemap.xml
+Sitemap: https://shantiappslab.github.io/funghi/sitemap.xml
+Sitemap: https://shantiappslab.github.io/champignons/sitemap.xml

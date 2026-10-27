@@ -6,6 +6,8 @@ Llegeix:
 - generador/apps/<carpeta>.json   nom de l'app, paquet de Play i textos de la interfície de cada idioma
 - <carpeta>/dades/contingut.json  fitxes, comarques i mapa (l'exporta BoletsApps: tools/web/exporta.py)
 - <carpeta>/meteo.json            pluja per comarca (la tasca programada del meteo, cada 6 hores)
+Apps d'una regió («regio» a la configuració, com Bolets): mapa i rànquing d'aquella regió. Apps d'un país sencer
+(«regio»: null): el mapa «pais» de contingut.json i el rànquing de tot el país, amb la regió de cada zona.
 Escriu les pàgines HTML de cada idioma (el primer a <carpeta>/, els altres a <carpeta>/<idioma>/) i <carpeta>/sitemap.xml.
 Només es reescriuen els fitxers que canvien. La portada canvia amb les dades del meteo i el mes; la resta, només si
 canvia el contingut. Els textos són els mateixos (revisats) que surten a l'app.
@@ -297,18 +299,25 @@ class Web:
                            t["comestibles_desc" if tipus == "comestibles" else "toxics_desc"], cos,
                            {i: self.url_llistat(tipus, i) for i in self.idiomes}, tipus, dades=dades)
 
+    def nom_zona(self, c, amb_regio=False):
+        """Nom d'una comarca; en les apps d'un país, amb la regió al costat si cal (p. ex. al rànquing)."""
+        z = self.dades["comarques"][c]
+        if amb_regio and not self.cfg.get("regio"):
+            return "%s (%s)" % (z["nom"], self.dades.get("comunitats", {}).get(z["comunitat"], ""))
+        return z["nom"]
+
     def mapa_svg(self, top, idioma):
         t = self.cfg["textos"][idioma]
-        m = self.dades["mapes"].get(self.cfg["regio"])
+        m = self.dades["mapes"].get(self.cfg.get("regio") or "pais")
         if not m:
             return ""
         camins = []
         for cid, d in sorted(m["camins"].items()):
-            classe = "pluja" if cid in top else "bosc" if self.dades["comarques"][cid]["bosc"] >= 0.4 else "terra"
+            classe = "pluja" if cid in top else "bosc" if self.dades["comarques"][cid]["bosc"] >= self.cfg.get("bosc_minim", 0.4) else "terra"
             camins.append(f'<path class="{classe}" d="{d}"><title>{e(self.dades["comarques"][cid]["nom"])}</title></path>')
         etiquetes = "".join(f'<circle cx="{m["centres"][c][0]}" cy="{m["centres"][c][1]}" r="11"/>'
                             f'<text x="{m["centres"][c][0]}" y="{m["centres"][c][1] + 4.5}">{n}</text>'
-                            for n, c in enumerate(top, 1))
+                            for n, c in enumerate(top, 1) if c in m["centres"])
         return (f'<figure class="mapa"><svg viewBox="0 0 {m["ample"]} {m["alt"]}" role="img" aria-label="{e(t["mapa_alt"])}">'
                 f'{"".join(camins)}<g class="num">{etiquetes}</g></svg>'
                 f'<figcaption><span class="pluja"></span>{e(t["mapa_llegenda_pluja"])} <span class="bosc"></span>{e(t["mapa_llegenda_bosc"])}</figcaption></figure>')
@@ -320,19 +329,20 @@ class Web:
         if m and m.get("comarcas"):
             data = dt.date.fromisoformat(m["fecha_datos"])
             if (avui - data).days <= DIES_VELLS:
-                regio = {c for c, d in self.dades["comarques"].items() if d["comunitat"] == self.cfg["regio"]}
-                pluja = sorted(((v["p15"], c) for c, v in m["comarcas"].items() if c in regio and "p15" in v), reverse=True)[:TOP_PLUJA]
+                regio = {c for c, d in self.dades["comarques"].items() if d["comunitat"] == self.cfg["regio"] or not self.cfg.get("regio")}
+                pluja = sorted(((v["p15"], c) for c, v in m["comarcas"].items() if c in regio and "p15" in v),
+                               reverse=True)[:self.cfg.get("top_pluja", TOP_PLUJA)]
                 top = [c for _, c in pluja]
-                noms = ["%s (%d l/m²)" % (self.dades["comarques"][c]["nom"], round(p)) for p, c in pluja]
+                noms = ["%s (%d l/m²)" % (self.nom_zona(c), round(p)) for p, c in pluja]
                 llista = ", ".join(noms[:3])
                 frase = (t["pluja_resum"] if pluja and pluja[0][0] >= POCA_PLUJA else t["pluja_poca"]).format(llista=llista)
-                data_txt = "%d %s de %d" % (data.day, t["de_mes"][data.month - 1], data.year)
+                data_txt = t.get("format_data", "{dia} {mes} de {any}").format(dia=data.day, mes=t["de_mes"][data.month - 1], any=data.year)
                 parts.append(f'<p class="data">{e(t["dades_fins"].format(font=self.cfg["font_meteo"][idioma], data=data_txt))}</p>')
                 parts.append(f'<p class="resum">{e(frase)}</p>')
                 parts.append(self.baixa(idioma, "portada"))
                 parts.append(self.mapa_svg(top, idioma))
                 parts.append(f'<section class="paper"><h2>{e(t["pluja_titol"])}</h2><ol class="ranquing">' + "".join(
-                    f'<li><b>{e(self.dades["comarques"][c]["nom"])}</b> <span>{round(p)} l/m²</span></li>' for p, c in pluja) +
+                    f'<li><b>{e(self.nom_zona(c, True))}</b> <span>{round(p)} l/m²</span></li>' for p, c in pluja) +
                     f'</ol><p>{e(t["pluja_consell"])}</p></section>')
                 parts.append(self.baixa(idioma, "portada_mapa", t["app_mapa"]))
         if not any('class="baixa"' in p for p in parts):
