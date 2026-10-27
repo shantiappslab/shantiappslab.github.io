@@ -16,6 +16,21 @@ h3{font-size:17px;margin:20px 0 8px}
 .molles{font-size:14px;color:var(--suau);margin-top:16px}
 section{background:#fff;border-radius:18px;padding:20px;margin:16px 0}
 .heroi{background:var(--nit);color:var(--gel)}
+.foto{position:relative;padding:0;overflow:hidden;min-height:240px;display:flex;align-items:flex-end;background:var(--nit)}
+.foto-alta{min-height:340px}
+.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.foto:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,34,56,.05) 0%,rgba(14,34,56,.35) 45%,rgba(14,34,56,.88) 100%)}
+.foto-text{position:relative;z-index:1;padding:24px 20px 34px;color:#fff}
+.foto-text h1{color:#fff;margin:0 0 6px;text-shadow:0 1px 12px rgba(0,0,0,.35)}
+.foto-text .lema{color:#fff}
+.foto-sub{margin:0;color:var(--gel);font-size:15px}
+.credit{position:absolute;right:12px;bottom:8px;z-index:1;font-size:11px;color:rgba(255,255,255,.8);text-decoration:none}
+.credit:hover{color:#fff}
+.parte-dia{font-size:17px;font-weight:600;color:var(--nit)}
+.intro{color:var(--suau)}
+.credits{list-style:none;padding:0;margin:0}
+.credits li{display:flex;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--gel)}
+.credits img{width:160px;height:96px;object-fit:cover;border-radius:10px;flex-shrink:0}
 .heroi h1{color:#fff}
 .lema{font:600 20px Sora,sans-serif;margin:0 0 8px}
 .heroi .nota{color:#A9BED3}
