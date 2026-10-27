@@ -50,6 +50,9 @@ class Web:
         p = os.path.join(WEB, carpeta, "meteo.json")
         self.meteo = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
         self.escrits = 0
+        # Versió de la fulla d'estils a l'enllaç: si canvia, cap navegador no fa servir la vella de la memòria cau
+        import hashlib
+        self.versio_css = hashlib.md5(open(os.path.join(WEB, "recursos", "bolets.css"), "rb").read()).hexdigest()[:8]
         self.urls = []
 
     # ---------- rutes ----------
@@ -93,7 +96,7 @@ class Web:
 {og}
 <link rel="icon" href="{self.cfg['icona']}">
 <link rel="preload" href="/recursos/fredoka.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="/recursos/bolets.css">{ld}
+<link rel="stylesheet" href="/recursos/bolets.css?v={self.versio_css}">{ld}
 </head>
 <body>
 <header class="cap"><a class="marca" href="{self.base(idioma)}"><img src="{self.cfg['icona']}" width="40" height="40" alt="">{e(self.cfg['app'])}</a>
@@ -156,14 +159,14 @@ class Web:
             return round(h * (MUNTANYA_MAR - (MUNTANYA_MAR - MUNTANYA_CIM) * m / ALTITUD_CIM), 1)
 
         xe = w + 18
-        escala = "".join(f'<line x1="{xe}" y1="{y(m)}" x2="{xe + 12}" y2="{y(m)}"/><text x="{xe + 20}" y="{y(m) + 12}">{mil(m)} m</text>'
+        escala = "".join(f'<line stroke="#3a2f1f" stroke-width="3" x1="{xe}" y1="{y(m)}" x2="{xe + 12}" y2="{y(m)}"/><text x="{xe + 20}" y="{y(m) + 12}">{mil(m)} m</text>'
                          for m in range(0, ALTITUD_CIM + 1, 500))
         svg = (f'<svg class="muntanya" viewBox="0 0 {w + 175} {h}" role="img" '
                f'aria-label="{e(t["altitud_alt"].format(min=mil(minim), max=mil(maxim)))}">'
                f'<image href="/{self.carpeta}/{f["fitxer"]}" width="{w}" height="{h}"/>'
-               f'<rect class="franja" x="0" y="{y(maxim)}" width="{w}" height="{round(y(minim) - y(maxim), 1)}"/>'
-               f'<g class="escala"><line x1="{xe}" y1="{y(0)}" x2="{xe}" y2="{y(ALTITUD_CIM)}"/>{escala}</g>'
-               f'<line class="barra" x1="{xe}" y1="{y(minim)}" x2="{xe}" y2="{y(maxim)}"/></svg>')
+               f'<rect class="franja" x="0" y="{y(maxim)}" width="{w}" height="{round(y(minim) - y(maxim), 1)}" fill="#2f6b1f" fill-opacity=".22"/>'
+               f'<g class="escala" fill="#3a2f1f" font-size="34" font-family="system-ui, sans-serif"><line stroke="#3a2f1f" stroke-width="3" x1="{xe}" y1="{y(0)}" x2="{xe}" y2="{y(ALTITUD_CIM)}"/>{escala}</g>'
+               f'<line class="barra" x1="{xe}" y1="{y(minim)}" x2="{xe}" y2="{y(maxim)}" stroke="#2f6b1f" stroke-width="14" stroke-linecap="round"/></svg>')
         return f'<section class="paper"><h2>{e(t["altitud_titol"])}</h2>{text}{svg}</section>'
 
     def molles(self, passos):
