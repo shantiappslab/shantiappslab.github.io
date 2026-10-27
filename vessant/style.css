@@ -1,0 +1,86 @@
+:root{--nit:#0E2238;--obaga:#1E4F8F;--cresta:#4A86C8;--gel:#D8E8F5;--neu:#F5F8FB;--text:#1D2B3A;--suau:#46607A;--alba:#B8501C}
+*{box-sizing:border-box}
+body{margin:0;background:var(--neu);color:var(--text);font:16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--obaga)}a:hover{color:var(--nit)}
+h1,h2,h3{font-family:Sora,Inter,system-ui,sans-serif;color:var(--nit);line-height:1.2}
+h1{font-size:clamp(28px,6vw,40px);margin:12px 0 8px}
+h2{font-size:22px;margin:0 0 12px}
+h3{font-size:17px;margin:20px 0 8px}
+.amplada{max-width:880px;margin:0 auto;padding:0 16px}
+.cap{background:var(--nit)}
+.cap .amplada{display:flex;align-items:center;justify-content:space-between;min-height:60px}
+.marca{display:flex;align-items:center;gap:10px;text-decoration:none}
+.rajola{display:flex;background:#fff;border-radius:8px;padding:5px 5px;flex-shrink:0}
+.simbol{width:30px;height:auto;flex-shrink:0}
+.paraula{height:26px;width:auto}
+@media (max-width:420px){.paraula{height:21px}.simbol{width:26px}.rajola{padding:4px}}
+.menu a{color:var(--gel);text-decoration:none;font-weight:600;padding:12px 4px}
+.molles{font-size:14px;color:var(--suau);margin-top:16px}
+section{background:#fff;border-radius:18px;padding:20px;margin:16px 0}
+.heroi{background:var(--nit);color:var(--gel)}
+.foto{position:relative;padding:0;overflow:hidden;min-height:240px;display:flex;align-items:flex-end;background:var(--nit)}
+.foto-alta{min-height:340px}
+.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.foto:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,34,56,.05) 0%,rgba(14,34,56,.35) 45%,rgba(14,34,56,.88) 100%)}
+.foto-text{position:relative;z-index:1;padding:24px 20px 34px;color:#fff}
+.foto-text h1{color:#fff;margin:0 0 6px;text-shadow:0 1px 12px rgba(0,0,0,.35)}
+.foto-text .lema{color:#fff}
+.foto-sub{margin:0;color:var(--gel);font-size:15px}
+.credit{position:absolute;right:12px;bottom:8px;z-index:1;font-size:11px;color:rgba(255,255,255,.8);text-decoration:none}
+.credit:hover{color:#fff}
+.parte-dia{font-size:17px;font-weight:600;color:var(--nit)}
+.intro{color:var(--suau)}
+.credits{list-style:none;padding:0;margin:0}
+.credits li{display:flex;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--gel)}
+.credits img{width:160px;height:96px;object-fit:cover;border-radius:10px;flex-shrink:0}
+.heroi h1{color:#fff}
+.lema{font:600 20px Sora,sans-serif;margin:0 0 8px}
+.heroi .nota{color:#A9BED3}
+.parte{color:#fff;font-size:17px}
+.nota{font-size:14px;color:var(--suau)}
+.estacions,.zones,.llista-simple,.avantatges{list-style:none;margin:0;padding:0}
+.estacions li a,.zones li a{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:12px 4px;border-bottom:1px solid var(--gel);text-decoration:none;color:var(--text);min-height:44px}
+.estacions li:last-child a,.zones li:last-child a{border-bottom:0}
+.estacions .nom,.zones .nom{font-weight:600;flex:1 1 220px;color:var(--nit)}
+.estat{font-size:14px;color:var(--suau);display:flex;align-items:center;gap:6px}
+.xifres{font-size:14px;font-weight:600}
+.prevista{color:var(--obaga)}
+.punt-obert,.punt-tancat{display:inline-block;width:10px;height:10px;border-radius:50%;background:#1F8A55}
+.punt-tancat{background:#8C96A8}
+.estat-gran{font:700 20px Sora,sans-serif;display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.xifres-grans{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.xifra{background:var(--neu);border-radius:12px;padding:12px}
+.xifra strong{display:block;font:700 24px Sora,sans-serif;color:var(--nit)}
+.xifra span{font-size:13px;color:var(--suau)}
+.taula{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--gel);white-space:nowrap}
+th{font-size:13px;color:var(--suau)}
+td.neu{font-weight:700;color:var(--obaga)}
+.nivell{display:inline-block;font-weight:700;border-radius:6px;padding:2px 8px;color:#fff}
+.n1{background:#CCFF66;color:#1D2B3A}.n2{background:#FFFF00;color:#1D2B3A}.n3{background:#FF9900;color:#1D2B3A}.n4{background:#FF0000}.n5{background:#000}
+.semafor{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:#B0B6BE}
+.semafor.verd{background:#2E9E5B}.semafor.ambre{background:#F0A020}.semafor.vermell{background:#D93A2B}
+.llista-simple li{padding:8px 0;border-bottom:1px solid var(--gel)}
+.llista-simple li:last-child{border-bottom:0}
+.dades{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0 0 12px}
+.dades dt{color:var(--suau)}.dades dd{margin:0;font-weight:600}
+.cta{background:var(--obaga);color:#fff;display:flex;gap:18px;align-items:flex-start}
+.cta h2{color:#fff}.cta p{color:var(--gel)}
+.cta-simbol .simbol{width:64px}
+.boto{display:inline-block;background:#fff;color:var(--nit);font-weight:700;text-decoration:none;border-radius:999px;padding:12px 20px;min-height:44px}
+.boto:hover{background:var(--gel);color:var(--nit)}
+.boto-aviat{background:var(--gel)}
+.avantatges li{padding:8px 0 8px 28px;position:relative}
+.avantatges li:before{content:"";position:absolute;left:4px;top:15px;width:12px;height:12px;border-radius:3px;background:var(--cresta)}
+.enllac-fort{font-weight:700}
+.idiomes li a{flex-direction:column;align-items:flex-start}
+.peu{background:var(--nit);color:#A9BED3;font-size:14px;margin-top:32px;padding:24px 0 96px}
+.peu a{color:var(--gel)}
+.peu strong{color:#fff}
+.barra{position:fixed;left:12px;right:12px;bottom:12px;display:flex;align-items:center;gap:10px;background:var(--nit);color:#fff;text-decoration:none;border-radius:16px;padding:10px 12px;box-shadow:0 6px 20px rgba(14,34,56,.3)}
+.barra:hover{color:#fff}
+.barra span{flex:1;font-weight:600;font-size:15px}
+.barra .barra-boto{flex:0 0 auto;background:#fff;color:var(--nit);border-radius:999px;padding:8px 14px;font-size:14px}
+@media (min-width:880px){.barra{display:none}.peu{padding-bottom:24px}}
+@media (max-width:600px){.cta{flex-direction:column;gap:8px}.cta-simbol .simbol{width:48px}}
