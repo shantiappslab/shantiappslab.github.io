@@ -136,9 +136,10 @@ def main():
     referencia = max(d for d, n in cuenta.items() if n >= 0.5 * maximo)
     ref = dt.date.fromisoformat(referencia)
 
-    def resumen(dias):
+    def resumen(dias, desfase=0):
+        """Lluvia de 7, 15 y 30 días y temperatura de 7 hasta el día de referencia, o hasta [desfase] días antes."""
         def ventana(n, campo):
-            vals = [dias.get((ref - dt.timedelta(days=i)).isoformat(), (None, None))[campo] for i in range(n)]
+            vals = [dias.get((ref - dt.timedelta(days=i + desfase)).isoformat(), (None, None))[campo] for i in range(n)]
             vals = [v for v in vals if v is not None]
             return vals if len(vals) >= 0.8 * n else None
         r = {}
@@ -149,6 +150,8 @@ def main():
         t = ventana(7, 1)
         if t is not None:
             r["t7"] = sum(t) / len(t)
+        if desfase:
+            return r
         for i in range(DIAS):
             p = dias.get((ref - dt.timedelta(days=i)).isoformat(), (None, None))[0]
             if p is not None and p >= LLUVIA_FUERTE:
@@ -158,6 +161,8 @@ def main():
 
     por_estacion = {e: resumen(d) for e, d in diario.items()}
     por_estacion = {e: r for e, r in por_estacion.items() if r and e in posicion}
+    # Los mismos datos de hace una semana (bloque «fa7»), para el parte semanal: qué comarcas suben y cuáles bajan
+    hace7 = {e: resumen(diario[e], 7) for e in por_estacion}
 
     # 3. Comarcas
     comarcas = json.load(open(COMARCAS, encoding="utf-8"))
@@ -185,6 +190,14 @@ def main():
         dias = [por_estacion[e]["dias"] for e in con_lluvia if "dias" in por_estacion[e]]
         if dias:
             m["dias"] = min(dias)
+        antes = {}
+        for campo in ("p7", "p15", "p30", "t7"):
+            vals = [hace7[e][campo] for e in propias if campo in hace7[e]] or \
+                [hace7[e][campo] for e in cerca if campo in hace7[e]][:3]
+            if vals:
+                antes[campo] = round(sum(vals) / len(vals), 1)
+        if m and antes:
+            m["fa7"] = antes
         if m:
             if estimado:
                 m["est"] = 1

@@ -129,7 +129,9 @@
    "bosc_alt": "Illustrazione di un bosco in autunno",
    "fotos_credits": "Foto: {credits} (Wikimedia Commons).",
    "altitud_titol": "Altitudine",
-   "altitud_alt": "Montagna con la fascia di altitudine dove nasce: da {min} a {max} m"
+   "altitud_alt": "Montagna con la fascia di altitudine dove nasce: da {min} a {max} m",
+   "micolegs_titol": "Cosa dicono i micologi questa settimana",
+   "micolegs_peu": "Riassunto automatico di fonti pubbliche, sempre con il link all'originale. Nell'app, con Stagione, il bollettino completo e gli avvisi delle tue zone."
   }
  },
  "bosc_minim": 0.45

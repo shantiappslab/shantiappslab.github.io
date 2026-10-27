@@ -51,6 +51,9 @@ class Web:
         self.bolets = {b["id"]: b for b in self.dades["bolets"]}
         p = os.path.join(WEB, carpeta, "meteo.json")
         self.meteo = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
+        # Nota micològica de la setmana (la publica la tasca programada setmanal; vegeu docs/PLA_SUBSCRIPCIO.md a BoletsApps)
+        p = os.path.join(WEB, carpeta, "nota.json")
+        self.nota = json.load(open(p, encoding="utf-8")) if os.path.exists(p) else None
         self.escrits = 0
         # Versió de la fulla d'estils a l'enllaç: si canvia, cap navegador no fa servir la vella de la memòria cau
         import hashlib
@@ -347,6 +350,7 @@ class Web:
                 parts.append(self.baixa(idioma, "portada_mapa", t["app_mapa"]))
         if not any('class="baixa"' in p for p in parts):
             parts.append(self.baixa(idioma, "portada"))
+        parts.append(self.nota_micologica(idioma, avui))
         mes = avui.month
         millors = [b for b in self.bolets.values() if b.get("camp") and mes in b["camp"]["millors"]]
         tambe = [b for b in self.bolets.values() if b.get("camp") and mes in b["camp"]["mesos"] and b not in millors]
@@ -370,6 +374,22 @@ class Web:
                "publisher": {"@type": "Organization", "name": "Shanti Apps Lab"}}
         return self.pagina(idioma, self.base(idioma), t["titol_portada"], t["portada_desc"],
                            "\n".join(parts), {i: self.base(i) for i in self.idiomes}, "portada", dades=[app])
+
+    def nota_micologica(self, idioma, avui):
+        """«Què diuen els micòlegs»: frases breus amb la font i l'enllaç; res si la nota té més de 10 dies."""
+        n, t = self.nota, self.cfg["textos"][idioma]
+        if not n or "micolegs_titol" not in t:
+            return ""
+        if (avui - dt.date.fromisoformat(n["setmana"])).days > 10:
+            return ""
+        frases = [(f["text"].get(idioma), f) for f in n.get("frases", [])]
+        frases = [(txt, f) for txt, f in frases if txt]
+        if not frases:
+            return ""
+        return (f'<section class="paper"><h2>{e(t["micolegs_titol"])}</h2>' +
+                "".join(f'<p>{e(txt)} <a href="{e(f["url"])}" rel="nofollow noopener" target="_blank">— {e(f["font"])}</a></p>'
+                        for txt, f in frases) +
+                f'<p class="data">{e(t["micolegs_peu"])}</p></section>')
 
     def genera(self):
         avui = dt.datetime.now(dt.timezone.utc).date()

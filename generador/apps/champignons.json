@@ -129,7 +129,9 @@
    "bosc_alt": "Illustration d'une forêt en automne",
    "fotos_credits": "Photos : {credits} (Wikimedia Commons).",
    "altitud_titol": "Altitude",
-   "altitud_alt": "Montagne avec la tranche d'altitude où il pousse : de {min} à {max} m"
+   "altitud_alt": "Montagne avec la tranche d'altitude où il pousse : de {min} à {max} m",
+   "micolegs_titol": "Ce que disent les mycologues cette semaine",
+   "micolegs_peu": "Résumé automatique de sources publiques, toujours avec le lien vers l'original. Dans l'appli, avec Saison, le bulletin complet et des alertes pour tes départements."
   }
  },
  "bosc_minim": 0.3

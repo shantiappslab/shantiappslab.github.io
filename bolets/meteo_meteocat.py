@@ -77,10 +77,14 @@ def instante(s):
     return int(utc.timestamp() * 1000)
 
 
-def agregado(funcion, variable, desde):
+def agregado(funcion, variable, desde, hasta=None):
+    """Suma o media por estación desde [desde] (incluido) hasta [hasta] (excluido; None = hasta hoy)."""
+    filtro = "codi_variable='%s' AND data_lectura>='%s'" % (variable, desde)
+    if hasta:
+        filtro += " AND data_lectura<'%s'" % hasta
     filas = consulta(DIARIAS, {
         "$select": "codi_estacio,%s(valor) as v" % funcion,
-        "$where": "codi_variable='%s' AND data_lectura>='%s'" % (variable, desde),
+        "$where": filtro,
         "$group": "codi_estacio", "$limit": "1000",
     })
     return {f["codi_estacio"]: float(f["v"]) for f in filas if f.get("v") not in (None, "")}
@@ -113,6 +117,10 @@ def main():
     p7, p15, p30 = agregado("sum", LLUVIA, hace(7)), agregado("sum", LLUVIA, hace(15)), agregado("sum", LLUVIA, hace(30))
     fuerte = ultima_lluvia_fuerte(hace(60))
     temp = agregado("avg", TEMPERATURA, hace(7))
+    # Los mismos datos de hace una semana (bloque «fa7»), para el parte semanal: qué comarcas suben y cuáles bajan
+    a7 = hace(7)
+    fa7 = {"p7": agregado("sum", LLUVIA, hace(14), a7), "p15": agregado("sum", LLUVIA, hace(22), a7),
+           "p30": agregado("sum", LLUVIA, hace(37), a7), "t7": agregado("avg", TEMPERATURA, hace(14), a7)}
     ultima = consulta(DIARIAS, {"$select": "max(data_lectura) as d", "$where": "codi_variable='%s'" % LLUVIA})[0]["d"]
     darrera = instante(ultima)
     if not p15 or not temp:
@@ -154,6 +162,10 @@ def main():
         datos["dias"] = int((darrera - max(fechas)) / 86_400_000) if fechas else None
         datos["t7"] = media(temp)
         m = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in datos.items() if v is not None}
+        antes = {k: media(v) for k, v in fa7.items()}
+        antes = {k: round(v, 2) for k, v in antes.items() if v is not None}
+        if antes:
+            m["fa7"] = antes
         if estimado:
             m["est"] = 1
         resultado[c["id"]] = m

@@ -110,16 +110,16 @@ def main():
     ultimo = next(d for d in fechas if sum(d in e["rr"] for e in activas) >= 0.8 * len(activas))
     ult = dt.datetime.strptime(ultimo, "%Y%m%d").date()
 
-    def dias_atras(n):
-        return [(ult - dt.timedelta(days=k)).strftime("%Y%m%d") for k in range(n)]
+    def dias_atras(n, desfase=0):
+        return [(ult - dt.timedelta(days=k + desfase)).strftime("%Y%m%d") for k in range(n)]
 
-    def suma(e, n):
-        ds = dias_atras(n)
+    def suma(e, n, desfase=0):
+        ds = dias_atras(n, desfase)
         v = [e["rr"][d] for d in ds if d in e["rr"]]
         return sum(v) * n / len(v) if len(v) >= 0.8 * n else None
 
-    def media_t(e):
-        v = [e["t"][d] for d in dias_atras(7) if d in e["t"]]
+    def media_t(e, desfase=0):
+        v = [e["t"][d] for d in dias_atras(7, desfase) if d in e["t"]]
         return sum(v) / len(v) if len(v) >= 5 else None
 
     def ultima_fuerte(e):
@@ -166,6 +166,14 @@ def main():
         fuertes = [x for x in (ultima_fuerte(estaciones[s]) for s in (propias or cercanas[:3])) if x is not None]
         m["dias"] = min(fuertes) if fuertes else None
         m = {kk: (round(v, 2) if isinstance(v, float) else v) for kk, v in m.items() if v is not None}
+        # Los mismos datos de hace una semana (bloque «fa7»), para el bulletin semanal: qué departamentos suben y bajan
+        ya_estimado = estimado  # la semana anterior no cambia la marca de «estimado» de los datos actuales
+        antes = {"p7": media(lambda e: suma(e, 7, 7)), "p15": media(lambda e: suma(e, 15, 7)),
+                 "p30": media(lambda e: suma(e, 30, 7)), "t7": media(lambda e: media_t(e, 7))}
+        estimado = ya_estimado
+        antes = {kk: round(v, 2) for kk, v in antes.items() if v is not None}
+        if antes:
+            m["fa7"] = antes
         if estimado:
             m["est"] = 1
         resultado[c["id"]] = m

@@ -118,7 +118,9 @@
    "bosc_alt": "Il·lustració d'un bosc de Catalunya a la tardor",
    "fotos_credits": "Fotos: {credits} (Wikimedia Commons).",
    "altitud_titol": "Altitud",
-   "altitud_alt": "Muntanya amb la franja d'altitud on surt: de {min} a {max} m"
+   "altitud_alt": "Muntanya amb la franja d'altitud on surt: de {min} a {max} m",
+   "micolegs_titol": "Què diuen els micòlegs aquesta setmana",
+   "micolegs_peu": "Resum automàtic de fonts públiques, sempre amb l'enllaç a l'original. A l'app, amb la Temporada, el butlletí complet i avisos de les teves comarques."
   },
   "es": {
    "lang": "es",
@@ -229,7 +231,9 @@
    "bosc_alt": "Ilustración de un bosque de Cataluña en otoño",
    "fotos_credits": "Fotos: {credits} (Wikimedia Commons).",
    "altitud_titol": "Altitud",
-   "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m"
+   "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m",
+   "micolegs_titol": "Qué dicen los micólogos esta semana",
+   "micolegs_peu": "Resumen automático de fuentes públicas, siempre con el enlace al original. En la app, con Temporada, el parte completo y avisos de tus comarcas."
   }
  },
  "heroi": {

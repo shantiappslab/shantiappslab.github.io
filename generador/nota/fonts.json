@@ -1,0 +1,27 @@
+{
+ "_nota": "Llista tancada de fonts per a la nota micològica setmanal (comprova_nota.py). Un domini inclou els seus subdominis. També s'accepta qualsevol domini que contingui una de les «paraules_domini» (societats i associacions micològiques). Les «excloses» són índexs algorítmics o apps competidores: no són micòlegs.",
+ "paraules_domini": ["micolog", "mycolog", "micologic", "mycologique", "micocyl"],
+ "excloses": ["myboletus.com", "champiscope.fr", "shroomcast.net", "boletradar.com", "bolets.app", "sporas.app", "mycora.app", "tattis.app", "sporecast.app"],
+ "comuns": ["gbif.org", "inaturalist.org"],
+ "bolets": [
+  "ctfc.cat", "gencat.cat", "3cat.cat", "ccma.cat", "naciodigital.cat", "vilaweb.cat", "beteve.cat", "ara.cat",
+  "elperiodico.cat", "elperiodico.com", "lavanguardia.com", "regio7.cat", "elpuntavui.cat", "segre.com",
+  "diaridegirona.cat", "naciodigital.cat", "lamalla.cat", "solsonaturisme.com", "bergueda.cat"
+ ],
+ "setas": [
+  "parquemicologicoultzama.com", "centromicologico.es", "micocyl.es", "fungiturismo.com", "rtve.es", "efeverde.com",
+  "elpais.com", "elmundo.es", "lavanguardia.com", "20minutos.es", "heraldo.es", "diariodenavarra.es",
+  "elnortedecastilla.es", "diariodeleon.es", "diariodesoria.es", "lavozdegalicia.es", "elcorreo.com", "eldiario.es",
+  "europapress.es", "ctfc.cat", "3cat.cat"
+ ],
+ "funghi": [
+  "funghimagazine.it", "ambbresadola.it", "ansa.it", "rainews.it", "corriere.it", "repubblica.it", "lanazione.it",
+  "ilrestodelcarlino.it", "ladige.it", "ilsecoloxix.it", "lastampa.it", "ilgazzettino.it", "altoadige.it",
+  "ildolomiti.it", "ilfattoquotidiano.it"
+ ],
+ "champignons": [
+  "mycofrance.fr", "francetvinfo.fr", "ici.fr", "francebleu.fr", "ouest-france.fr", "sudouest.fr", "lamontagne.fr",
+  "ledauphine.com", "estrepublicain.fr", "leprogres.fr", "lindependant.fr", "midilibre.fr", "ladepeche.fr",
+  "actu.fr", "lefigaro.fr", "lemonde.fr", "onf.fr", "shnd.fr"
+ ]
+}

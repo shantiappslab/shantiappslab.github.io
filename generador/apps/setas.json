@@ -128,7 +128,9 @@
    "bosc_alt": "Ilustración de un bosque en otoño",
    "fotos_credits": "Fotos: {credits} (Wikimedia Commons).",
    "altitud_titol": "Altitud",
-   "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m"
+   "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m",
+   "micolegs_titol": "Qué dicen los micólogos esta semana",
+   "micolegs_peu": "Resumen automático de fuentes públicas, siempre con el enlace al original. En la app, con Temporada, el parte completo y avisos de tus comarcas."
   }
  },
  "bosc_minim": 0.35
