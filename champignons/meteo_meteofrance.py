@@ -29,6 +29,9 @@ import re
 import sys
 import urllib.request
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "generador"))
+import balanc_sol  # noqa: E402  humitat del sòl (balanç d'aigua)
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP = os.path.join(os.path.dirname(ROOT), "app", "src", os.path.basename(ROOT))
 # En la web, el script va en champignons/ junto a departements_meteo.json (copia de comarcas.json de la app)
@@ -93,7 +96,8 @@ def main():
         for f in filas:
             if len(f) < len(cab) or f[i["AAAAMMJJ"]] < desde:
                 continue
-            e = estaciones.setdefault(f[i["NUM_POSTE"]], {"lat": num(f[i["LAT"]]), "lon": num(f[i["LON"]]), "rr": {}, "t": {}})
+            e = estaciones.setdefault(f[i["NUM_POSTE"]], {"lat": num(f[i["LAT"]]), "lon": num(f[i["LON"]]), "rr": {}, "t": {},
+                                                          "tx": {}, "tn": {}})
             d = f[i["AAAAMMJJ"]]
             rr = num(f[i["RR"]])
             if rr is not None and f[i["QRR"]].strip() != "2":
@@ -103,6 +107,10 @@ def main():
                 t = num(f[i["TNTXM"]])
             if t is not None:
                 e["t"][d] = t
+            for col, clau in (("TX", "tx"), ("TN", "tn")):
+                x = num(f[i[col]]) if col in i else None
+                if x is not None:
+                    e[clau][d] = x
 
     # Último día con datos: el más reciente con RR en al menos el 80 % de las estaciones activas
     activas = [e for e in estaciones.values() if e["rr"]]
@@ -171,6 +179,21 @@ def main():
         antes = {"p7": media(lambda e: suma(e, 7, 7)), "p15": media(lambda e: suma(e, 15, 7)),
                  "p30": media(lambda e: suma(e, 30, 7)), "t7": media(lambda e: media_t(e, 7))}
         estimado = ya_estimado
+        # Humidité du sol: série journalière moyenne des stations du département (ou des 3 plus proches)
+        usadas = [s for s in propias if estaciones[s]["rr"]] or [s for s in cercanas if estaciones[s]["rr"]][:3]
+        serie = []
+        for kk in range(DIAS - 1, -1, -1):
+            dd = (ult - dt.timedelta(days=kk)).strftime("%Y%m%d")
+
+            def med(clau):
+                xs = [estaciones[s][clau][dd] for s in usadas if dd in estaciones[s][clau]]
+                return sum(xs) / len(xs) if xs else None
+            rr = med("rr")
+            if rr is not None:
+                serie.append((dt.datetime.strptime(dd, "%Y%m%d").date(), rr, med("t"), med("tx"), med("tn")))
+        sol = balanc_sol.humitat(serie, clat)
+        if sol:
+            m["sol"], m["sol14"] = sol
         antes = {kk: round(v, 2) for kk, v in antes.items() if v is not None}
         if antes:
             m["fa7"] = antes

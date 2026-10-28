@@ -34,6 +34,10 @@ ESTACIONES = "yqwd-vj5e"
 LLUVIA = "1300"  # Precipitación acumulada diaria
 TEMPERATURA = "1000"  # Temperatura media diaria
 DIST_MAX_KM = 40.0
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "generador"))
+import balanc_sol  # noqa: E402  humitat del sòl (balanç d'aigua)
+TMAX = "1001"
+TMIN = "1002"
 UA = {"User-Agent": "BoletsDeCatalunya/1.0 (app gratuita; shantiappslab@gmail.com)", "Accept": "application/json"}
 
 
@@ -90,6 +94,26 @@ def agregado(funcion, variable, desde, hasta=None):
     return {f["codi_estacio"]: float(f["v"]) for f in filas if f.get("v") not in (None, "")}
 
 
+def diarias(desde):
+    """Valores diarios por estación desde [desde]: {variable: {estación: {fecha: valor}}} (para la humedad del suelo)."""
+    out = {v: {} for v in (LLUVIA, TEMPERATURA, TMAX, TMIN)}
+    offset = 0
+    while True:
+        filas = consulta(DIARIAS, {
+            "$select": "codi_estacio,codi_variable,data_lectura,valor",
+            "$where": "codi_variable in ('%s','%s','%s','%s') AND data_lectura>='%s'" % (LLUVIA, TEMPERATURA, TMAX, TMIN, desde),
+            "$order": "data_lectura,codi_estacio,codi_variable", "$limit": "50000", "$offset": str(offset),
+        })
+        for f in filas:
+            try:
+                out[f["codi_variable"]].setdefault(f["codi_estacio"], {})[f["data_lectura"][:10]] = float(f["valor"])
+            except (KeyError, ValueError):
+                pass
+        if len(filas) < 50000:
+            return out
+        offset += 50000
+
+
 def ultima_lluvia_fuerte(desde):
     """Código de estación → instante (ms) del último día con ≥ 10 mm."""
     filas = consulta(DIARIAS, {
@@ -117,6 +141,9 @@ def main():
     p7, p15, p30 = agregado("sum", LLUVIA, hace(7)), agregado("sum", LLUVIA, hace(15)), agregado("sum", LLUVIA, hace(30))
     fuerte = ultima_lluvia_fuerte(hace(60))
     temp = agregado("avg", TEMPERATURA, hace(7))
+    diaris = diarias(hace(90))
+    hoy = dt.date.fromisoformat(hace(1)[:10])
+    dias_sol = [hoy - dt.timedelta(days=k) for k in range(89, -1, -1)]
     # Los mismos datos de hace una semana (bloque «fa7»), para el parte semanal: qué comarcas suben y cuáles bajan
     a7 = hace(7)
     fa7 = {"p7": agregado("sum", LLUVIA, hace(14), a7), "p15": agregado("sum", LLUVIA, hace(22), a7),
@@ -162,6 +189,14 @@ def main():
         datos["dias"] = int((darrera - max(fechas)) / 86_400_000) if fechas else None
         datos["t7"] = media(temp)
         m = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in datos.items() if v is not None}
+        # Humedad del suelo: serie diaria de la comarca (media de las mismas estaciones que la lluvia)
+        def dia(var, f):
+            return media({e: s[f] for e, s in diaris[var].items() if f in s})
+        serie = [(f, dia(LLUVIA, f.isoformat()), dia(TEMPERATURA, f.isoformat()), dia(TMAX, f.isoformat()), dia(TMIN, f.isoformat()))
+                 for f in dias_sol]
+        sol = balanc_sol.humitat([x for x in serie if x[1] is not None or x[2] is not None], c["lat"])
+        if sol:
+            m["sol"], m["sol14"] = sol
         antes = {k: media(v) for k, v in fa7.items()}
         antes = {k: round(v, 2) for k, v in antes.items() if v is not None}
         if antes:

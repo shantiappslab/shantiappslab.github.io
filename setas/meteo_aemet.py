@@ -22,12 +22,15 @@ import sys
 import time
 import urllib.request
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "generador"))
+import balanc_sol  # noqa: E402  humitat del sòl (balanç d'aigua)
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
 BASE = "https://opendata.aemet.es/opendata"
 SALIDA = os.path.join(AQUI, "meteo.json")
 ESTADO = os.path.join(AQUI, "estado_obs.json")
 COMARCAS = os.path.join(AQUI, "comarcas_meteo.json")
-DIAS = 60
+DIAS = 75  # 60 per al «fa7» i la lluvia; la humedad del suelo necesita ~60 días de serie
 DIAS_ESTADO = 12
 HORAS_MIN = 18  # horas observadas para dar por bueno un día a partir de las observaciones
 DIST_MAX_KM = 50
@@ -111,7 +114,8 @@ def main():
         datos = consulta("/api/valores/climatologicos/diarios/datos/fechaini/%sT00:00:00UTC/fechafin/%sT23:59:59UTC/todasestaciones"
                          % (ini.isoformat(), fin.isoformat()), clave)
         for d in datos:
-            diario.setdefault(d["indicativo"], {})[d["fecha"]] = (numero(d.get("prec")), numero(d.get("tmed")))
+            diario.setdefault(d["indicativo"], {})[d["fecha"]] = (numero(d.get("prec")), numero(d.get("tmed")),
+                                                                  numero(d.get("tmax")), numero(d.get("tmin")))
         time.sleep(3)
     estaciones = consulta("/api/valores/climatologicos/inventarioestaciones/todasestaciones", clave)
     posicion = {e["indicativo"]: (dms(e["longitud"]), dms(e["latitud"])) for e in estaciones}
@@ -124,7 +128,8 @@ def main():
             precs = [p for p, _ in horas.values() if p is not None]
             temps = [t for _, t in horas.values() if t is not None]
             if len(precs) >= HORAS_MIN:
-                diario.setdefault(e, {})[dia] = (round(sum(precs), 1), round(sum(temps) / len(temps), 1) if temps else None)
+                diario.setdefault(e, {})[dia] = (round(sum(precs), 1), round(sum(temps) / len(temps), 1) if temps else None,
+                                                 max(temps) if temps else None, min(temps) if temps else None)
 
     # Último día con datos de la mayoría de estaciones = día de referencia
     cuenta = {}
@@ -139,7 +144,7 @@ def main():
     def resumen(dias, desfase=0):
         """Lluvia de 7, 15 y 30 días y temperatura de 7 hasta el día de referencia, o hasta [desfase] días antes."""
         def ventana(n, campo):
-            vals = [dias.get((ref - dt.timedelta(days=i + desfase)).isoformat(), (None, None))[campo] for i in range(n)]
+            vals = [dias.get((ref - dt.timedelta(days=i + desfase)).isoformat(), (None, None, None, None))[campo] for i in range(n)]
             vals = [v for v in vals if v is not None]
             return vals if len(vals) >= 0.8 * n else None
         r = {}
@@ -153,7 +158,7 @@ def main():
         if desfase:
             return r
         for i in range(DIAS):
-            p = dias.get((ref - dt.timedelta(days=i)).isoformat(), (None, None))[0]
+            p = dias.get((ref - dt.timedelta(days=i)).isoformat(), (None, None, None, None))[0]
             if p is not None and p >= LLUVIA_FUERTE:
                 r["dias"] = i
                 break
@@ -198,6 +203,22 @@ def main():
                 antes[campo] = round(sum(vals) / len(vals), 1)
         if m and antes:
             m["fa7"] = antes
+        # Humedad del suelo: serie diaria media de las estaciones de la comarca (o de las 3 más cercanas)
+        usadas = [e for e in propias if e in diario] or [e for e in cerca if e in diario][:3]
+        if m and usadas:
+            serie = []
+            for k in range(DIAS - 1, -1, -1):
+                f = (ref - dt.timedelta(days=k)).isoformat()
+                vals = [diario[e][f] for e in usadas if f in diario[e]]
+
+                def med(i):
+                    xs = [v[i] for v in vals if v[i] is not None]
+                    return sum(xs) / len(xs) if xs else None
+                if vals:
+                    serie.append((dt.date.fromisoformat(f), med(0), med(1), med(2), med(3)))
+            sol = balanc_sol.humitat(serie, cy)
+            if sol:
+                m["sol"], m["sol14"] = sol
         if m:
             if estimado:
                 m["est"] = 1
