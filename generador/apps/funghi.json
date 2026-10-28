@@ -76,7 +76,7 @@
    "mapa_llegenda_pluja": "Le 8 zone con più pioggia",
    "mapa_llegenda_bosc": "Zone con molto bosco",
    "mapa_alt": "Mappa dell'Italia con le zone dove ha piovuto di più negli ultimi 15 giorni",
-   "app_mapa": "Nell'app, la mappa completa della tua regione: la probabilità di trovare funghi in ogni zona, la pioggia e la temperatura, e i tuoi posti nel taccuino.",
+   "app_mapa": "Nell'app, la mappa completa della tua regione: la probabilità di trovare funghi in ogni zona, la pioggia, la temperatura e l'umidità del suolo, e i tuoi posti nel taccuino.",
    "temporada_titol": "Cosa esce questo mese ({mes})",
    "temporada_millors": "Nel momento migliore",
    "temporada_tambe": "Escono anche",
@@ -131,8 +131,17 @@
    "altitud_titol": "Altitudine",
    "altitud_alt": "Montagna con la fascia di altitudine dove nasce: da {min} a {max} m",
    "micolegs_titol": "Cosa dicono i micologi questa settimana",
-   "micolegs_peu": "Riassunto automatico di fonti pubbliche, sempre con il link all'originale. Nell'app, con Stagione, il bollettino completo e gli avvisi delle tue zone."
+   "micolegs_peu": "Riassunto automatico di fonti pubbliche, sempre con il link all'originale. Nell'app, con Stagione, il bollettino completo e gli avvisi delle tue zone.",
+   "videos_titol": "Come funziona l'app"
   }
  },
- "bosc_minim": 0.45
+ "bosc_minim": 0.45,
+ "videos": {
+  "it": [
+   {
+    "id": "ag0S17BhLxg",
+    "titol": "Funghi d'Italia: l'app per andare a funghi"
+   }
+  ]
+ }
 }

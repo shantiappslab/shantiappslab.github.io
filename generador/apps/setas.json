@@ -75,7 +75,7 @@
    "mapa_llegenda_pluja": "Las 8 comarcas con más lluvia",
    "mapa_llegenda_bosc": "Comarcas con mucho bosque",
    "mapa_alt": "Mapa de España con las comarcas donde más ha llovido en los últimos 15 días",
-   "app_mapa": "En la app, el mapa completo de tu comunidad: la probabilidad de encontrar setas en cada comarca, la lluvia y la temperatura, y tus sitios en el cuaderno.",
+   "app_mapa": "En la app, el mapa completo de tu comunidad: la probabilidad de encontrar setas en cada comarca, la lluvia, la temperatura y la humedad del suelo, y tus sitios en el cuaderno.",
    "temporada_titol": "Qué sale este mes ({mes})",
    "temporada_millors": "En su mejor momento",
    "temporada_tambe": "También salen",
@@ -130,8 +130,17 @@
    "altitud_titol": "Altitud",
    "altitud_alt": "Montaña con la franja de altitud donde sale: de {min} a {max} m",
    "micolegs_titol": "Qué dicen los micólogos esta semana",
-   "micolegs_peu": "Resumen automático de fuentes públicas, siempre con el enlace al original. En la app, con Temporada, el parte completo y avisos de tus comarcas."
+   "micolegs_peu": "Resumen automático de fuentes públicas, siempre con el enlace al original. En la app, con Temporada, el parte completo y avisos de tus comarcas.",
+   "videos_titol": "Cómo funciona la app"
   }
  },
- "bosc_minim": 0.35
+ "bosc_minim": 0.35,
+ "videos": {
+  "es": [
+   {
+    "id": "2p_drPkxWvE",
+    "titol": "Setas de España: la app para ir a buscar setas"
+   }
+  ]
+ }
 }
