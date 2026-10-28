@@ -57,7 +57,8 @@ class Web:
         self.escrits = 0
         # Versió de la fulla d'estils a l'enllaç: si canvia, cap navegador no fa servir la vella de la memòria cau
         import hashlib
-        self.versio_css = hashlib.md5(open(os.path.join(WEB, "recursos", "bolets.css"), "rb").read()).hexdigest()[:8]
+        # Amb salts de línia normalitzats: a Windows el fitxer pot tenir CRLF i la versió ha de ser la mateixa que a GitHub
+        self.versio_css = hashlib.md5(open(os.path.join(WEB, "recursos", "bolets.css"), "rb").read().replace(b"\r\n", b"\n")).hexdigest()[:8]
         self.urls = []
 
     # ---------- rutes ----------
