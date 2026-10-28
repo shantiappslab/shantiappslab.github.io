@@ -27,10 +27,10 @@ def radiacio_mm(lat, dia_any):
     return 0.408 * ra
 
 
-def humitat(dies, lat):
+def humitat(dies, lat, minim=45):
     """[dies]: llista ordenada de (date, pluja, tmitjana, tmax, tmin), amb None on no hi ha dada.
     Retorna (humitat d'avui, mitjana de 14 dies, mitjana de fa 7 a 21 dies), de 0 a 1, o None si la sèrie és massa curta."""
-    if len(dies) < 45:
+    if len(dies) < minim:
         return None
     w = 0.3 * WMAX
     hist = collections.deque(maxlen=21)

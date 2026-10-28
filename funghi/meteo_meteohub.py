@@ -7,12 +7,15 @@ la app los usuarios que tenga.
 - API pública de MeteoHub (https://meteohub.agenziaitaliameteo.it/api/observations), sin clave. Solo las redes con
   licencia CC BY 4.0 (grupo de licencias CCBY_COMPLIANT): estaciones de los servicios meteorológicos regionales y de
   protección civil, ARPAE, y la red de aficionados MeteoNetwork (esta solo cuando una zona no tiene estaciones oficiales).
-- Lluvia: suma de los valores horarios de cada día (modo «daily» de la API, que ya los armoniza a una hora).
+- Lluvia: suma de los datos brutos de cada estación (acumulados de 1 min a 1 h, según la red), pedidos en tramos de
+  6 horas. No se usa el modo «daily» de la API: desde octubre de 2026 en los días recientes solo devuelve las últimas
+  1-3 horas, y el filtro de horas mínimas dejaba esos días sin ninguna estación.
 - Temperatura: media de las lecturas instantáneas a las 0, 6, 12 y 18 UTC (aproximación clásica de la media diaria).
-- Sin cuenta, MeteoHub solo da los últimos ~4 días («to access archived data the user has to be logged»): el
+- Sin cuenta, MeteoHub solo da los últimos ~10 días («to access archived data the user has to be logged»): el
   historial (45 días de lluvia, 7 de temperatura) se va acumulando en funghi/estado_meteohub.json, que se guarda en la
-  caché de Actions (no en git). Cada ejecución vuelve a pedir los últimos DIAS_PEDIR días. Tras 15 días seguidos de
-  ejecuciones ya están la lluvia de 15 días y el índice; tras 30, la lluvia de 30 días.
+  caché de Actions (no en git). Cada ejecución vuelve a pedir los últimos DIAS_PEDIR días y, además, los días aún
+  accesibles que falten en el historial (p. ej. si se pierde la caché). Tras 15 días seguidos de ejecuciones ya está
+  la lluvia de 15 días; tras 30, la de 30 días.
 - Cada zona toma la media de sus estaciones oficiales; si no tiene, la de las 3 más cercanas (≤ 25 km) y, si tampoco,
   las de aficionados.
 
@@ -38,12 +41,18 @@ SALIDA = os.environ.get("SALIDA") or os.path.join(AQUI, "meteo.json")
 UMBRAL_DIAS = float(os.environ.get("UMBRAL_DIAS") or 0.8)
 ESTADO = os.path.join(AQUI, "estado_meteohub.json")
 ZONAS = os.path.join(AQUI, "zonas_meteo.json")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "generador"))
+import balanc_sol  # noqa: E402  humitat del sòl (balanç d'aigua)
+
 UA = {"User-Agent": "FunghiDItalia/1.0 (app gratuita; shantiappslab@gmail.com)", "Accept": "application/json"}
-DIAS_LLUVIA = 45
-DIAS_TEMP = 7
-DIAS_PEDIR = 4  # días completos que se vuelven a pedir en cada ejecución (el acceso anónimo no llega más atrás)
+DIAS_LLUVIA = 75  # 30 de lluvia + una semana para el «fa7»; la humedad del suelo usa toda la serie
+DIAS_TEMP = 75  # la media de 7 días y la serie de la humedad del suelo
+DIAS_MIN_SOL = 30  # días de historial necesarios para publicar la humedad del suelo
+DIAS_PEDIR = 4  # días completos que se vuelven a pedir en cada ejecución (algunas redes envían con retraso)
+DIAS_ANONIMO = 10  # hasta dónde se buscan días que falten en el historial (antes da HTTP 401)
+MIN_ESTACIONES = 500  # un día con menos estaciones se considera incompleto
 HORAS_TEMP = (0, 6, 12, 18)
-HORAS_MIN_LLUVIA = 20
+HORAS_MIN_LLUVIA = 20  # horas del día cubiertas (en proporción, con datos de cualquier resolución)
 DIST_MAX_KM = 25
 LLUVIA_FUERTE = 10.0  # mm en un día
 AFICIONADOS = "mnw"
@@ -74,26 +83,37 @@ def clave(stat):
 
 
 def lluvia_dia(dia, pos):
-    """{estación: mm} del día (UTC) con al menos HORAS_MIN_LLUVIA horas."""
-    d = pide("reftime: >=%s 00:00,<=%s 23:59;product:B13011" % (dia, dia), {"daily": "true"})
-    if d is None:
-        return None
-    res = {}
-    for s in d.get("data", []):
-        k = clave(s["stat"])
-        pos[k] = [round(s["stat"]["lon"], 4), round(s["stat"]["lat"], 4), s["stat"]["net"]]
-        for p in s["prod"]:
-            if p["var"] != "B13011":
-                continue
-            horas = {}
-            for v in p["val"]:
-                if v.get("rel", 1) == 1 and v["ref"].startswith(dia) and v["val"] is not None and 0 <= v["val"] < 200:
-                    horas[v["ref"][11:13]] = v["val"]
-            if len(horas) >= HORAS_MIN_LLUVIA:
-                total = sum(horas.values()) * 24 / len(horas)
-                if total < 400:
-                    res[k] = round(total, 1)
-    return res
+    """{estación: mm} del día (UTC) con al menos HORAS_MIN_LLUVIA horas cubiertas.
+
+    Cada estación puede dar el acumulado en varios pasos (p. ej. 15 min y 1 h): se usa el que más cubre del día. Los
+    acumulados diarios (timerange 1,0,86400) no se usan: todas las estaciones que los dan tienen también horarios."""
+    acumulados = {}  # (estación, paso en s) -> {hora de referencia: mm}
+    for h in range(0, 24, 6):
+        d = pide("reftime: >=%s %02d:00,<=%s %02d:59;product:B13011" % (dia, h, dia, h + 5))
+        if d is None:
+            return None
+        for s in d.get("data", []):
+            k = clave(s["stat"])
+            pos[k] = [round(s["stat"]["lon"], 4), round(s["stat"]["lat"], 4), s["stat"]["net"]]
+            for p in s["prod"]:
+                try:
+                    paso = int(p.get("trange", "").split(",")[2])
+                except (IndexError, ValueError):
+                    continue
+                if p["var"] != "B13011" or not 0 < paso < 86400 or 86400 % paso:
+                    continue
+                vals = acumulados.setdefault((k, paso), {})
+                for v in p["val"]:
+                    if v.get("rel", 1) == 1 and v["ref"].startswith(dia) and v["val"] is not None and 0 <= v["val"] < 200:
+                        vals[v["ref"]] = v["val"]
+        del d
+        time.sleep(2)
+    mejor = {}  # estación -> (cobertura, paso, mm)
+    for (k, paso), vals in acumulados.items():
+        cobertura = min(1.0, len(vals) * paso / 86400)
+        if cobertura >= HORAS_MIN_LLUVIA / 24 and (cobertura, paso) > mejor.get(k, (0, 0))[:2]:
+            mejor[k] = (cobertura, paso, sum(vals.values()) / cobertura)
+    return {k: round(mm, 1) for k, (_, _, mm) in mejor.items() if mm < 400}
 
 
 def temperatura_dia(dia, pos):
@@ -112,7 +132,8 @@ def temperatura_dia(dia, pos):
                 if vals:
                     lecturas.setdefault(k, {})[h] = vals[0]
         time.sleep(2)
-    return {k: round(sum(v.values()) / len(v), 1) for k, v in lecturas.items() if len(v) >= 3}
+    return {k: [round(sum(v.values()) / len(v), 1), round(max(v.values()), 1), round(min(v.values()), 1)]
+            for k, v in lecturas.items() if len(v) >= 3}
 
 
 def dentro(anillos, x, y):
@@ -136,19 +157,26 @@ def main():
     lluvia = estado.get("lluvia", {})
     temp = estado.get("temp", {})
 
-    # Los últimos DIAS_PEDIR días completos (algunas redes envían los datos con retraso); los anteriores, del estado.
-    # Un día que vuelva con menos estaciones que las guardadas (p. ej. ya fuera del acceso anónimo) no se sobrescribe.
-    for i in range(DIAS_PEDIR):
+    # Los últimos DIAS_PEDIR días completos (algunas redes envían los datos con retraso) y los días aún accesibles sin
+    # cuenta que falten o estén incompletos en el estado; los demás, del estado.
+    # Un día que vuelva con menos estaciones que las guardadas no se sobrescribe.
+    for i in range(DIAS_ANONIMO):
         dia = (ayer - dt.timedelta(days=i)).isoformat()
-        l = lluvia_dia(dia, pos)
-        if l is not None and len(l) >= len(lluvia.get(dia, {})):
-            lluvia[dia] = l
-        print("lluvia", dia, "sin acceso" if l is None else len(l), "estaciones")
-        time.sleep(2)
-        t = temperatura_dia(dia, pos)
-        if t is not None and len(t) >= len(temp.get(dia, {})):
-            temp[dia] = t
-        print("temperatura", dia, "sin acceso" if t is None else len(t), "estaciones")
+        pedir_l = i < DIAS_PEDIR or len(lluvia.get(dia, {})) < MIN_ESTACIONES
+        pedir_t = i < DIAS_PEDIR or len(temp.get(dia, {})) < MIN_ESTACIONES
+        if pedir_l:
+            l = lluvia_dia(dia, pos)
+            if l is not None and len(l) >= len(lluvia.get(dia, {})):
+                lluvia[dia] = l
+            print("lluvia", dia, "sin acceso" if l is None else len(l), "estaciones")
+            if l is None:
+                break
+            time.sleep(2)
+        if pedir_t:
+            t = temperatura_dia(dia, pos)
+            if t is not None and len(t) >= len(temp.get(dia, {})):
+                temp[dia] = t
+            print("temperatura", dia, "sin acceso" if t is None else len(t), "estaciones")
     limite_l = (ayer - dt.timedelta(days=DIAS_LLUVIA - 1)).isoformat()
     limite_t = (ayer - dt.timedelta(days=DIAS_TEMP - 1)).isoformat()
     lluvia = {d: v for d, v in lluvia.items() if d >= limite_l}
@@ -160,12 +188,17 @@ def main():
     maximo = max(len(v) for v in lluvia.values())
     referencia = max(d for d, v in lluvia.items() if len(v) >= 0.6 * maximo)
     ref = dt.date.fromisoformat(referencia)
-    if maximo < 500:
+    if maximo < MIN_ESTACIONES:
         raise RuntimeError("Muy pocas estaciones con datos (%d): no se publica" % maximo)
 
-    def resumen(k):
+    def t_media(v):
+        """Temperatura guardada: [media, máx, mín] (o solo la media, en estados antiguos)."""
+        return v[0] if isinstance(v, list) else v
+
+    def resumen(k, desfase=0):
         def ventana(n, serie):
-            vals = [serie.get((ref - dt.timedelta(days=i)).isoformat(), {}).get(k) for i in range(n)]
+            vals = [serie.get((ref - dt.timedelta(days=i + desfase)).isoformat(), {}).get(k) for i in range(n)]
+            vals = [t_media(v) if isinstance(v, list) else v for v in vals]
             vals = [v for v in vals if v is not None]
             return vals if len(vals) >= UMBRAL_DIAS * n else None
         r = {}
@@ -176,6 +209,8 @@ def main():
         t = ventana(7, temp)
         if t is not None:
             r["t7"] = sum(t) / len(t)
+        if desfase:
+            return r
         for i in range(DIAS_LLUVIA):
             p = lluvia.get((ref - dt.timedelta(days=i)).isoformat(), {}).get(k)
             if p is not None and p >= LLUVIA_FUERTE:
@@ -185,6 +220,7 @@ def main():
 
     por_estacion = {k: resumen(k) for k in pos}
     por_estacion = {k: r for k, r in por_estacion.items() if r}
+    hace7 = {k: resumen(k, 7) for k in por_estacion}  # bloque «fa7» para el parte semanal
 
     salida = {}
     for z in json.load(open(ZONAS, encoding="utf-8")):
@@ -214,6 +250,36 @@ def main():
                 if dias:
                     m["dias"] = min(dias)
                 break
+        # Datos de hace una semana, con el mismo orden de grupos de estaciones
+        antes = {}
+        for campo in ("p7", "p15", "p30", "t7"):
+            for estaciones, _ in grupos:
+                vals = [hace7[e][campo] for e in estaciones if campo in hace7.get(e, {})]
+                if vals:
+                    antes[campo] = round(sum(vals) / len(vals), 1)
+                    break
+        if m and antes:
+            m["fa7"] = antes
+        # Humedad del suelo: serie diaria media del primer grupo de estaciones con lluvia
+        usadas = next((ests for ests, _ in grupos if any(e in por_estacion for e in ests)), [])
+        if m and usadas:
+            serie = []
+            for i in range(DIAS_LLUVIA - 1, -1, -1):
+                d = (ref - dt.timedelta(days=i)).isoformat()
+                ps = [lluvia.get(d, {}).get(e) for e in usadas]
+                ps = [x for x in ps if x is not None]
+                if not ps:
+                    continue
+                ts = [temp.get(d, {}).get(e) for e in usadas]
+                ts = [x if isinstance(x, list) else [x, None, None] for x in ts if x is not None]
+
+                def med(j):
+                    xs = [x[j] for x in ts if x[j] is not None]
+                    return sum(xs) / len(xs) if xs else None
+                serie.append((dt.date.fromisoformat(d), sum(ps) / len(ps), med(0), med(1), med(2)))
+            sol = balanc_sol.humitat(serie, cy, DIAS_MIN_SOL)
+            if sol:
+                m["sol"], m["sol14"], m["sol_retard"] = sol
         if m:
             if estimado:
                 m["est"] = 1
