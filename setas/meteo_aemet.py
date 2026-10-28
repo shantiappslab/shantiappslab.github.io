@@ -134,7 +134,7 @@ def main():
     # Último día con datos de la mayoría de estaciones = día de referencia
     cuenta = {}
     for dias in diario.values():
-        for dia, (p, _) in dias.items():
+        for dia, (p, *_) in dias.items():
             if p is not None:
                 cuenta[dia] = cuenta.get(dia, 0) + 1
     maximo = max(cuenta.values())
