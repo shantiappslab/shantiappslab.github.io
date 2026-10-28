@@ -218,7 +218,7 @@ def main():
                     serie.append((dt.date.fromisoformat(f), med(0), med(1), med(2), med(3)))
             sol = balanc_sol.humitat(serie, cy)
             if sol:
-                m["sol"], m["sol14"] = sol
+                m["sol"], m["sol14"], m["sol_retard"] = sol
         if m:
             if estimado:
                 m["est"] = 1

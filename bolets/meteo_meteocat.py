@@ -196,7 +196,7 @@ def main():
                  for f in dias_sol]
         sol = balanc_sol.humitat([x for x in serie if x[1] is not None or x[2] is not None], c["lat"])
         if sol:
-            m["sol"], m["sol14"] = sol
+            m["sol"], m["sol14"], m["sol_retard"] = sol
         antes = {k: media(v) for k, v in fa7.items()}
         antes = {k: round(v, 2) for k, v in antes.items() if v is not None}
         if antes:

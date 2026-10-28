@@ -6,7 +6,9 @@ millor les setmanes amb troballes de cep i rovelló que la pluja de 30 dies.
 - Cada dia resta l'evapotranspiració (Hargreaves, amb la temperatura màxima i mínima i la radiació solar segons la
   latitud i el dia de l'any), menys com més sec és el sòl.
 - Capacitat: 100 mm. Es comença al 30 % i calen uns 60 dies de sèrie perquè el valor sigui estable.
-Retorna la humitat d'avui i la mitjana dels últims 14 dies (la que fa servir l'índex), de 0 a 1.
+Retorna la humitat d'avui, la mitjana dels últims 14 dies i la de fa 7 a 21 dies, de 0 a 1. L'índex fa la mitjana
+de les dues últimes: els bolets responen a la humitat de les setmanes anteriors (validat el 2026-10-28: millor o igual
+que només els últims 14 dies als quatre països).
 """
 import collections
 import math
@@ -27,11 +29,11 @@ def radiacio_mm(lat, dia_any):
 
 def humitat(dies, lat):
     """[dies]: llista ordenada de (date, pluja, tmitjana, tmax, tmin), amb None on no hi ha dada.
-    Retorna (humitat d'avui, mitjana de 14 dies), de 0 a 1, o None si la sèrie és massa curta."""
+    Retorna (humitat d'avui, mitjana de 14 dies, mitjana de fa 7 a 21 dies), de 0 a 1, o None si la sèrie és massa curta."""
     if len(dies) < 45:
         return None
     w = 0.3 * WMAX
-    hist = collections.deque(maxlen=14)
+    hist = collections.deque(maxlen=21)
     for d, p, t, tx, tn in dies:
         if t is None and tx is not None and tn is not None:
             t = (tx + tn) / 2
@@ -46,4 +48,7 @@ def humitat(dies, lat):
         w = w + efectiva
         w = max(0.0, min(WMAX, w - et0 * (w / WMAX)))
         hist.append(w / WMAX)
-    return round(hist[-1], 3), round(sum(hist) / len(hist), 3)
+    h = list(hist)
+    ultims14 = h[-14:]
+    retard = h[:-7] or h
+    return round(h[-1], 3), round(sum(ultims14) / len(ultims14), 3), round(sum(retard) / len(retard), 3)

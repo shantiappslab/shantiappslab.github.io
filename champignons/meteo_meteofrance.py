@@ -193,7 +193,7 @@ def main():
                 serie.append((dt.datetime.strptime(dd, "%Y%m%d").date(), rr, med("t"), med("tx"), med("tn")))
         sol = balanc_sol.humitat(serie, clat)
         if sol:
-            m["sol"], m["sol14"] = sol
+            m["sol"], m["sol14"], m["sol_retard"] = sol
         antes = {kk: round(v, 2) for kk, v in antes.items() if v is not None}
         if antes:
             m["fa7"] = antes
