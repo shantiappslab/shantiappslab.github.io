@@ -55,13 +55,22 @@ def inicia_sesion():
     usuario, clave_acceso = os.environ.get("METEOHUB_USER"), os.environ.get("METEOHUB_PASSWORD")
     if not usuario or not clave_acceso:
         return False
-    cuerpo = json.dumps({"username": usuario, "password": clave_acceso}).encode("utf-8")
-    req = urllib.request.Request(LOGIN, data=cuerpo, headers=dict(UA, **{"Content-Type": "application/json"}))
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            resp = json.loads(r.read().decode("utf-8"))
-    except Exception as e:  # noqa: BLE001
-        print("Sin sesión en MeteoHub (%s): se sigue sin cuenta" % e, file=sys.stderr)
+    datos = {"username": usuario, "password": clave_acceso}
+    resp = None
+    # RAPyDo (la plataforma de MeteoHub) acepta el login como formulario; por si acaso, también como JSON
+    for cuerpo, tipo in ((urllib.parse.urlencode(datos), "application/x-www-form-urlencoded"),
+                         (json.dumps(datos), "application/json")):
+        req = urllib.request.Request(LOGIN, data=cuerpo.encode("utf-8"), headers=dict(UA, **{"Content-Type": tipo}))
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                resp = json.loads(r.read().decode("utf-8"))
+            break
+        except urllib.error.HTTPError as e:
+            print("Login MeteoHub (%s): %s %s" % (tipo, e.code, e.read().decode("utf-8", "replace")[:300]), file=sys.stderr)
+        except Exception as e:  # noqa: BLE001
+            print("Login MeteoHub (%s): %s" % (tipo, e), file=sys.stderr)
+    if resp is None:
+        print("Sin sesión en MeteoHub: se sigue sin cuenta", file=sys.stderr)
         return False
     token = resp if isinstance(resp, str) else next(
         (resp.get(k) for k in ("access_token", "token", "jwt") if isinstance(resp, dict) and resp.get(k)), None)
