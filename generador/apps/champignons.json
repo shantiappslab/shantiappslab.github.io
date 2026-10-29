@@ -131,8 +131,17 @@
    "altitud_titol": "Altitude",
    "altitud_alt": "Montagne avec la tranche d'altitude où il pousse : de {min} à {max} m",
    "micolegs_titol": "Ce que disent les mycologues cette semaine",
-   "micolegs_peu": "Résumé automatique de sources publiques, toujours avec le lien vers l'original. Dans l'appli, avec Saison, le bulletin complet et des alertes pour tes départements."
+   "micolegs_peu": "Résumé automatique de sources publiques, toujours avec le lien vers l'original. Dans l'appli, avec Saison, le bulletin complet et des alertes pour tes départements.",
+   "videos_titol": "Comment fonctionne l'appli"
   }
  },
- "bosc_minim": 0.3
+ "bosc_minim": 0.3,
+ "videos": {
+  "fr": [
+   {
+    "id": "S29eZC8GDt0",
+    "titol": "Champignons de France : où vont pousser les champignons cette semaine"
+   }
+  ]
+ }
 }

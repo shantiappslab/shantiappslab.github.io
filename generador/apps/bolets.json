@@ -252,6 +252,10 @@
  "videos": {
   "ca": [
    {
+    "id": "Et28g3-4tFI",
+    "titol": "Presentació de l'app: on sortiran bolets aquesta setmana"
+   },
+   {
     "id": "nB7uEw1Qums",
     "titol": "El mapa: on estan sortint bolets i com es calcula la probabilitat"
    },
@@ -262,8 +266,8 @@
   ],
   "es": [
    {
-    "id": "xt-Qj3AP3fA",
-    "titol": "Presentación de la app"
+    "id": "KozHPO_Z7OE",
+    "titol": "Presentación de la app: dónde saldrán setas esta semana"
    },
    {
     "id": "nB7uEw1Qums",
