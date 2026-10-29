@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setas de España</title>
+<meta name="description" content="Guía de setas de España para Android. Funciona sin conexión.">
+<style>
+  :root { --bg: #f4efe6; --card: #ffffff; --text: #3b2a1e; --muted: #7a6a5c; --accent: #2e7d32; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 16px; }
+  .card { background: var(--card); border-radius: 20px; padding: 32px 24px; max-width: 420px; width: 100%;
+          text-align: center; box-shadow: 0 6px 24px rgba(59, 42, 30, .12); }
+  .icon { display: block; margin: 0 auto 16px; border-radius: 28px; box-shadow: 0 4px 14px rgba(59, 42, 30, .18); }
+  h1 { margin: 0 0 8px; font-size: 26px; }
+  p { margin: 0 0 24px; color: var(--muted); line-height: 1.45; }
+  a.button { display: block; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600;
+             font-size: 18px; padding: 16px; border-radius: 14px; }
+  a.alt { display: inline-block; margin-top: 16px; color: var(--muted); font-size: 14px; }
+  .note { margin-top: 24px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main class="card">
+  <img class="icon" src="icon.png" width="128" height="128" alt="Icono de Setas de España">
+  <h1>Setas de España</h1>
+  <p>La guía de setas de España en tu móvil. Funciona sin conexión.</p>
+  <a class="button" id="play" href="https://play.google.com/store/apps/details?id=com.shantiappslab.setasdeespana&amp;referrer=utm_source%3Dinstagram">Descárgala en Google Play</a>
+  <a class="alt" href="https://play.google.com/store/apps/details?id=com.shantiappslab.setasdeespana&amp;referrer=utm_source%3Dinstagram">Abrir en el navegador</a>
+  <p class="note" id="ios" hidden>De momento solo está disponible para Android.</p>
+</main>
+<script>
+  // Al navegador d'Instagram (Android), els enllaços a play.google.com s'obren com a web;
+  // un enllaç intent:// obre directament l'app de Google Play.
+  (function () {
+    var ua = navigator.userAgent || "";
+    var pkg = "com.shantiappslab.setasdeespana";
+    var web = "https://play.google.com/store/apps/details?id=" + pkg + "&referrer=utm_source%3Dinstagram";
+    if (/android/i.test(ua)) {
+      var intent = "intent://details?id=" + pkg + "&referrer=utm_source%3Dinstagram"
+        + "#Intent;scheme=market;package=com.android.vending;S.browser_fallback_url="
+        + encodeURIComponent(web) + ";end";
+      document.getElementById("play").href = intent;
+    } else if (/iphone|ipad|ipod/i.test(ua)) {
+      document.getElementById("ios").hidden = false;
+    }
+  })();
+</script>
+</body>
+</html>
