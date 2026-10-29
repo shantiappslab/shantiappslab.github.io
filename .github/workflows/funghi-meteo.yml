@@ -34,6 +34,9 @@ jobs:
           restore-keys: funghi-meteohub-
       - name: Descargar y resumir los datos de MeteoHub
         run: python3 funghi/meteo_meteohub.py
+        env:
+          METEOHUB_USER: ${{ secrets.METEOHUB_USER }}
+          METEOHUB_PASSWORD: ${{ secrets.METEOHUB_PASSWORD }}
       - name: Regenerar la web (portada con la lluvia de la semana)
         run: python3 generador/genera.py funghi
       - name: Guardar el historial acumulado

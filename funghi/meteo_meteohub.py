@@ -11,7 +11,9 @@ la app los usuarios que tenga.
   6 horas. No se usa el modo «daily» de la API: desde octubre de 2026 en los días recientes solo devuelve las últimas
   1-3 horas, y el filtro de horas mínimas dejaba esos días sin ninguna estación.
 - Temperatura: media de las lecturas instantáneas a las 0, 6, 12 y 18 UTC (aproximación clásica de la media diaria).
-- Sin cuenta, MeteoHub solo da los últimos ~10 días («to access archived data the user has to be logged»): el
+- Sin cuenta, MeteoHub solo da los últimos ~10 días («to access archived data the user has to be logged»). Si existen
+  las variables METEOHUB_USER y METEOHUB_PASSWORD (secretos del repositorio), se inicia sesión y se rellenan también los
+  días más antiguos que falten, como mucho MAX_DIAS_NUEVOS por ejecución para no pasar del tiempo de la tarea. El
   historial (45 días de lluvia, 7 de temperatura) se va acumulando en funghi/estado_meteohub.json, que se guarda en la
   caché de Actions (no en git). Cada ejecución vuelve a pedir los últimos DIAS_PEDIR días y, además, los días aún
   accesibles que falten en el historial (p. ej. si se pierde la caché). Tras 15 días seguidos de ejecuciones ya está
@@ -45,11 +47,37 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 import balanc_sol  # noqa: E402  humitat del sòl (balanç d'aigua)
 
 UA = {"User-Agent": "FunghiDItalia/1.0 (app gratuita; shantiappslab@gmail.com)", "Accept": "application/json"}
+LOGIN = "https://meteohub.agenziaitaliameteo.it/auth/login"
+
+
+def inicia_sesion():
+    """Con los secretos METEOHUB_USER y METEOHUB_PASSWORD, añade el token a UA. Devuelve True si hay sesión."""
+    usuario, clave_acceso = os.environ.get("METEOHUB_USER"), os.environ.get("METEOHUB_PASSWORD")
+    if not usuario or not clave_acceso:
+        return False
+    cuerpo = json.dumps({"username": usuario, "password": clave_acceso}).encode("utf-8")
+    req = urllib.request.Request(LOGIN, data=cuerpo, headers=dict(UA, **{"Content-Type": "application/json"}))
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            resp = json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print("Sin sesión en MeteoHub (%s): se sigue sin cuenta" % e, file=sys.stderr)
+        return False
+    token = resp if isinstance(resp, str) else next(
+        (resp.get(k) for k in ("access_token", "token", "jwt") if isinstance(resp, dict) and resp.get(k)), None)
+    if not token:
+        print("Sin sesión en MeteoHub (respuesta sin token: %s): se sigue sin cuenta" % type(resp).__name__,
+              file=sys.stderr)
+        return False
+    UA["Authorization"] = "Bearer " + token
+    print("Sesión iniciada en MeteoHub")
+    return True
 DIAS_LLUVIA = 75  # 30 de lluvia + una semana para el «fa7»; la humedad del suelo usa toda la serie
 DIAS_TEMP = 75  # la media de 7 días y la serie de la humedad del suelo
 DIAS_MIN_SOL = 30  # días de historial necesarios para publicar la humedad del suelo
 DIAS_PEDIR = 4  # días completos que se vuelven a pedir en cada ejecución (algunas redes envían con retraso)
-DIAS_ANONIMO = 10  # hasta dónde se buscan días que falten en el historial (antes da HTTP 401)
+DIAS_ANONIMO = 10  # hasta dónde se buscan días que falten en el historial sin cuenta (antes da HTTP 401)
+MAX_DIAS_NUEVOS = 10  # días antiguos que faltan que se piden en cada ejecución con cuenta
 MIN_ESTACIONES = 500  # un día con menos estaciones se considera incompleto
 HORAS_TEMP = (0, 6, 12, 18)
 HORAS_MIN_LLUVIA = 20  # horas del día cubiertas (en proporción, con datos de cualquier resolución)
@@ -160,10 +188,17 @@ def main():
     # Los últimos DIAS_PEDIR días completos (algunas redes envían los datos con retraso) y los días aún accesibles sin
     # cuenta que falten o estén incompletos en el estado; los demás, del estado.
     # Un día que vuelva con menos estaciones que las guardadas no se sobrescribe.
-    for i in range(DIAS_ANONIMO):
+    con_cuenta = inicia_sesion()
+    nuevos = 0
+    for i in range(DIAS_LLUVIA if con_cuenta else DIAS_ANONIMO):
         dia = (ayer - dt.timedelta(days=i)).isoformat()
         pedir_l = i < DIAS_PEDIR or len(lluvia.get(dia, {})) < MIN_ESTACIONES
         pedir_t = i < DIAS_PEDIR or len(temp.get(dia, {})) < MIN_ESTACIONES
+        if i >= DIAS_ANONIMO and (pedir_l or pedir_t):
+            if nuevos >= MAX_DIAS_NUEVOS:
+                print("historial: quedan días por pedir; siguen en la próxima ejecución")
+                break
+            nuevos += 1
         if pedir_l:
             l = lluvia_dia(dia, pos)
             if l is not None and len(l) >= len(lluvia.get(dia, {})):
