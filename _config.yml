@@ -1,0 +1,4 @@
+# GitHub Pages (Jekyll) ignora les carpetes que comencen per punt: .well-known ha de ser-hi perquè Android
+# verifiqui els enllaços de Vessant (App Links) amb /.well-known/assetlinks.json.
+include:
+  - .well-known

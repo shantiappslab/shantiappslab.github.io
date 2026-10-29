@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.shantiappslab.vessant",
+      "sha256_cert_fingerprints": [
+        "56:88:51:8A:B0:7E:18:1B:8A:49:0E:FE:EA:20:27:28:32:BE:B4:4E:55:CC:5C:96:87:05:39:E3:FF:3F:F9:4F",
+        "61:C9:98:D2:0C:BB:3B:88:7B:B7:53:AB:49:FA:B5:87:EA:BB:B8:4D:2F:84:F8:9B:48:D0:73:DD:E3:F5:F7:F4",
+        "10:FA:9B:BF:99:19:C0:5E:6D:49:CC:F9:EC:B1:CA:3D:11:6B:9E:67:AB:9A:51:DF:EE:63:2F:2A:A6:8F:F1:8F"
+      ]
+    }
+  }
+]
