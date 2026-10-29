@@ -212,6 +212,21 @@ def main():
                 print("historial: quedan días por pedir; siguen en la próxima ejecución")
                 break
             nuevos += 1
+            # Días del archivo (solo con cuenta): si MeteoHub falla, se publica con lo que ya hay
+            try:
+                l = lluvia_dia(dia, pos) if pedir_l else None
+                t = temperatura_dia(dia, pos) if pedir_t else None
+            except RuntimeError as e:
+                print("historial: el archivo no responde (%s); siguen en la próxima ejecución" % e, file=sys.stderr)
+                break
+            if l is not None and len(l) >= len(lluvia.get(dia, {})):
+                lluvia[dia] = l
+            if t is not None and len(t) >= len(temp.get(dia, {})):
+                temp[dia] = t
+            print("archivo", dia, "lluvia", "—" if l is None else len(l), "temperatura", "—" if t is None else len(t))
+            if pedir_l and l is None:
+                break
+            continue
         if pedir_l:
             l = lluvia_dia(dia, pos)
             if l is not None and len(l) >= len(lluvia.get(dia, {})):
