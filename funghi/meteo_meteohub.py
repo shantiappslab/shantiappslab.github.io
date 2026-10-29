@@ -91,6 +91,8 @@ DIAS_MIN_SOL = 30  # días de historial necesarios para publicar la humedad del 
 DIAS_PEDIR = 4  # días completos que se vuelven a pedir en cada ejecución (algunas redes envían con retraso)
 DIAS_ANONIMO = 10  # hasta dónde se buscan días que falten en el historial sin cuenta (antes da HTTP 401)
 MAX_DIAS_NUEVOS = 10  # días antiguos que faltan que se piden en cada ejecución con cuenta
+MINUTOS_ARCHIVO = 15  # tiempo máximo dedicado al archivo en cada ejecución (la tarea tiene 30 min)
+TRAMO_ARCHIVO = 1  # horas por petición en el archivo: con 6 h MeteoHub corta (HTTP 502)
 MIN_ESTACIONES = 500  # un día con menos estaciones se considera incompleto
 HORAS_TEMP = (0, 6, 12, 18)
 HORAS_MIN_LLUVIA = 20  # horas del día cubiertas (en proporción, con datos de cualquier resolución)
@@ -123,14 +125,14 @@ def clave(stat):
     return "%s|%.4f|%.4f" % (stat["net"], stat["lat"], stat["lon"])
 
 
-def lluvia_dia(dia, pos):
+def lluvia_dia(dia, pos, tramo=6, intentos=4):
     """{estación: mm} del día (UTC) con al menos HORAS_MIN_LLUVIA horas cubiertas.
 
     Cada estación puede dar el acumulado en varios pasos (p. ej. 15 min y 1 h): se usa el que más cubre del día. Los
     acumulados diarios (timerange 1,0,86400) no se usan: todas las estaciones que los dan tienen también horarios."""
     acumulados = {}  # (estación, paso en s) -> {hora de referencia: mm}
-    for h in range(0, 24, 6):
-        d = pide("reftime: >=%s %02d:00,<=%s %02d:59;product:B13011" % (dia, h, dia, h + 5))
+    for h in range(0, 24, tramo):
+        d = pide("reftime: >=%s %02d:00,<=%s %02d:59;product:B13011" % (dia, h, dia, h + tramo - 1), intentos=intentos)
         if d is None:
             return None
         for s in d.get("data", []):
@@ -157,11 +159,11 @@ def lluvia_dia(dia, pos):
     return {k: round(mm, 1) for k, (_, _, mm) in mejor.items() if mm < 400}
 
 
-def temperatura_dia(dia, pos):
+def temperatura_dia(dia, pos, intentos=4):
     """{estación: °C} del día: media de las lecturas a las HORAS_TEMP (al menos 3 de 4)."""
     lecturas = {}
     for h in HORAS_TEMP:
-        d = pide("reftime: >=%s %02d:00,<=%s %02d:09;product:B12101;timerange:254,0,0;level:103,2000,0,0" % (dia, h, dia, h))
+        d = pide("reftime: >=%s %02d:00,<=%s %02d:09;product:B12101;timerange:254,0,0;level:103,2000,0,0" % (dia, h, dia, h), intentos=intentos)
         if d is None:
             return None
         for s in d.get("data", []):
@@ -203,19 +205,20 @@ def main():
     # Un día que vuelva con menos estaciones que las guardadas no se sobrescribe.
     con_cuenta = inicia_sesion()
     nuevos = 0
+    fin_archivo = time.time() + MINUTOS_ARCHIVO * 60
     for i in range(DIAS_LLUVIA if con_cuenta else DIAS_ANONIMO):
         dia = (ayer - dt.timedelta(days=i)).isoformat()
         pedir_l = i < DIAS_PEDIR or len(lluvia.get(dia, {})) < MIN_ESTACIONES
         pedir_t = i < DIAS_PEDIR or len(temp.get(dia, {})) < MIN_ESTACIONES
         if i >= DIAS_ANONIMO and (pedir_l or pedir_t):
-            if nuevos >= MAX_DIAS_NUEVOS:
+            if nuevos >= MAX_DIAS_NUEVOS or time.time() > fin_archivo:
                 print("historial: quedan días por pedir; siguen en la próxima ejecución")
                 break
             nuevos += 1
             # Días del archivo (solo con cuenta): si MeteoHub falla, se publica con lo que ya hay
             try:
-                l = lluvia_dia(dia, pos) if pedir_l else None
-                t = temperatura_dia(dia, pos) if pedir_t else None
+                l = lluvia_dia(dia, pos, TRAMO_ARCHIVO, 2) if pedir_l else None
+                t = temperatura_dia(dia, pos, 2) if pedir_t else None
             except RuntimeError as e:
                 print("historial: el archivo no responde (%s); siguen en la próxima ejecución" % e, file=sys.stderr)
                 break
