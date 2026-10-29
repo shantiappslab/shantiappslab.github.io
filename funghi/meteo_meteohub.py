@@ -92,7 +92,7 @@ DIAS_PEDIR = 4  # días completos que se vuelven a pedir en cada ejecución (alg
 DIAS_ANONIMO = 10  # hasta dónde se buscan días que falten en el historial sin cuenta (antes da HTTP 401)
 MAX_DIAS_NUEVOS = 10  # días antiguos que faltan que se piden en cada ejecución con cuenta
 MINUTOS_ARCHIVO = 15  # tiempo máximo dedicado al archivo en cada ejecución (la tarea tiene 30 min)
-TRAMO_ARCHIVO = 1  # horas por petición en el archivo: con 6 h MeteoHub corta (HTTP 502)
+TRAMO_ARCHIVO = 3  # horas por petición en el archivo: con 6 h MeteoHub corta (HTTP 502); si falla, se prueba con 1 h
 MIN_ESTACIONES = 500  # un día con menos estaciones se considera incompleto
 HORAS_TEMP = (0, 6, 12, 18)
 HORAS_MIN_LLUVIA = 20  # horas del día cubiertas (en proporción, con datos de cualquier resolución)
@@ -217,7 +217,10 @@ def main():
             nuevos += 1
             # Días del archivo (solo con cuenta): si MeteoHub falla, se publica con lo que ya hay
             try:
-                l = lluvia_dia(dia, pos, TRAMO_ARCHIVO, 2) if pedir_l else None
+                try:
+                    l = lluvia_dia(dia, pos, TRAMO_ARCHIVO, 1) if pedir_l else None
+                except RuntimeError:
+                    l = lluvia_dia(dia, pos, 1, 2)
                 t = temperatura_dia(dia, pos, 2) if pedir_t else None
             except RuntimeError as e:
                 print("historial: el archivo no responde (%s); siguen en la próxima ejecución" % e, file=sys.stderr)
