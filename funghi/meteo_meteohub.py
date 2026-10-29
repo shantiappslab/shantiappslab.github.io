@@ -52,7 +52,9 @@ LOGIN = "https://meteohub.agenziaitaliameteo.it/auth/login"
 
 def inicia_sesion():
     """Con los secretos METEOHUB_USER y METEOHUB_PASSWORD, añade el token a UA. Devuelve True si hay sesión."""
-    usuario, clave_acceso = os.environ.get("METEOHUB_USER"), os.environ.get("METEOHUB_PASSWORD")
+    # Sin espacios ni saltos de línea al principio o al final (al pegar el secreto en la terminal se pueden colar)
+    usuario = (os.environ.get("METEOHUB_USER") or "").strip().strip("\"'")
+    clave_acceso = (os.environ.get("METEOHUB_PASSWORD") or "").strip("\r\n")
     if not usuario or not clave_acceso:
         return False
     datos = {"username": usuario, "password": clave_acceso}
@@ -66,6 +68,8 @@ def inicia_sesion():
                 resp = json.loads(r.read().decode("utf-8"))
             break
         except urllib.error.HTTPError as e:
+            if "@" not in usuario:
+                print("METEOHUB_USER no parece un correo (%d caracteres)" % len(usuario), file=sys.stderr)
             print("Login MeteoHub (%s): %s %s" % (tipo, e.code, e.read().decode("utf-8", "replace")[:300]), file=sys.stderr)
         except Exception as e:  # noqa: BLE001
             print("Login MeteoHub (%s): %s" % (tipo, e), file=sys.stderr)
