@@ -13,7 +13,15 @@ h3{font-size:17px;margin:20px 0 8px}
 .simbol{width:40px;height:auto;flex-shrink:0}
 .paraula{height:26px;width:auto}
 @media (max-width:420px){.paraula{height:22px}.marca .simbol{width:34px}}
-.menu a{color:var(--gel);text-decoration:none;font-weight:600;padding:12px 4px}
+.cap .amplada{flex-wrap:wrap;gap:0 16px}
+.menu{display:flex;flex-wrap:wrap;gap:0 14px}
+.menu a{color:var(--gel);text-decoration:none;font-weight:600;padding:12px 0;font-size:15px}
+@media (max-width:600px){.menu{width:100%;gap:0 10px;padding-bottom:6px}.menu a{padding:4px 0 8px;font-size:13px}}
+.nota-finde{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:32px;border-radius:10px;font:700 17px Sora,sans-serif;color:#fff}
+.nota-bona{background:#1F8A55}.nota-mitja{background:#B5650A}.nota-baixa{background:#6F7A8C}
+.motius{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px}
+.motiu{font-size:13px;border-radius:999px;padding:2px 10px;background:var(--gel);color:var(--nit)}
+.motiu.dolent{background:#F6E1DC;color:#8A2A1A}
 .molles{font-size:14px;color:var(--suau);margin-top:16px}
 section{background:#fff;border-radius:18px;padding:20px;margin:16px 0}
 .heroi{background:var(--nit);color:var(--gel)}
