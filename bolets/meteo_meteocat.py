@@ -204,6 +204,11 @@ def main():
             m["sol50"], m["sol50_14"], m["sol50_retard"] = sol
         antes = {k: media(v) for k, v in fa7.items()}
         antes = {k: round(v, 2) for k, v in antes.items() if v is not None}
+        # Humedad del suelo de hace una semana (misma serie sin los 7 últimos días), para comparar el índice con el mismo
+        # cálculo en «Què ha canviat aquesta setmana» del boletín
+        sol = balanc_sol.humitat(serie[:-7], c["lat"], wmax=50.0)
+        if sol and antes:
+            antes["sol50"], antes["sol50_14"], antes["sol50_retard"] = sol
         if antes:
             m["fa7"] = antes
         if estimado:
