@@ -6,6 +6,9 @@ millor les setmanes amb troballes de cep i rovelló que la pluja de 30 dies.
 - Cada dia resta l'evapotranspiració (Hargreaves, amb la temperatura màxima i mínima i la radiació solar segons la
   latitud i el dia de l'any), menys com més sec és el sòl.
 - Capacitat: 100 mm. Es comença al 30 % i calen uns 60 dies de sèrie perquè el valor sigui estable.
+- Bolets de Catalunya (des de la 0.6.3) fa servir també un sòl de 50 mm («sol50»): s'asseca abans després d'un mes
+  molt plujós i, amb el sostre del 85 % a l'app, distingeix millor les bones temporades de les dolentes (calibratge del
+  2026-10-30 amb la XEMA i GBIF 2008-2024; a Espanya, França i Itàlia no millora i no es fa servir).
 Retorna la humitat d'avui, la mitjana dels últims 14 dies i la de fa 7 a 21 dies, de 0 a 1. L'índex fa la mitjana
 de les dues últimes: els bolets responen a la humitat de les setmanes anteriors (validat el 2026-10-28: millor o igual
 que només els últims 14 dies als quatre països).
@@ -27,12 +30,12 @@ def radiacio_mm(lat, dia_any):
     return 0.408 * ra
 
 
-def humitat(dies, lat, minim=45):
+def humitat(dies, lat, minim=45, wmax=WMAX):
     """[dies]: llista ordenada de (date, pluja, tmitjana, tmax, tmin), amb None on no hi ha dada.
     Retorna (humitat d'avui, mitjana de 14 dies, mitjana de fa 7 a 21 dies), de 0 a 1, o None si la sèrie és massa curta."""
     if len(dies) < minim:
         return None
-    w = 0.3 * WMAX
+    w = 0.3 * wmax
     hist = collections.deque(maxlen=21)
     for d, p, t, tx, tn in dies:
         if t is None and tx is not None and tn is not None:
@@ -46,8 +49,8 @@ def humitat(dies, lat, minim=45):
         p = p or 0.0
         efectiva = p if p <= CAP_DIA else CAP_DIA + 0.2 * (p - CAP_DIA)
         w = w + efectiva
-        w = max(0.0, min(WMAX, w - et0 * (w / WMAX)))
-        hist.append(w / WMAX)
+        w = max(0.0, min(wmax, w - et0 * (w / wmax)))
+        hist.append(w / wmax)
     h = list(hist)
     ultims14 = h[-14:]
     retard = h[:-7] or h

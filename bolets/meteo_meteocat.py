@@ -194,9 +194,14 @@ def main():
             return media({e: s[f] for e, s in diaris[var].items() if f in s})
         serie = [(f, dia(LLUVIA, f.isoformat()), dia(TEMPERATURA, f.isoformat()), dia(TMAX, f.isoformat()), dia(TMIN, f.isoformat()))
                  for f in dias_sol]
-        sol = balanc_sol.humitat([x for x in serie if x[1] is not None or x[2] is not None], c["lat"])
+        serie = [x for x in serie if x[1] is not None or x[2] is not None]
+        sol = balanc_sol.humitat(serie, c["lat"])
         if sol:
             m["sol"], m["sol14"], m["sol_retard"] = sol
+        # Sòl de 50 mm (app 0.6.3 i posteriors; la 0.6.2 continua amb els camps de 100 mm)
+        sol = balanc_sol.humitat(serie, c["lat"], wmax=50.0)
+        if sol:
+            m["sol50"], m["sol50_14"], m["sol50_retard"] = sol
         antes = {k: media(v) for k, v in fa7.items()}
         antes = {k: round(v, 2) for k, v in antes.items() if v is not None}
         if antes:
