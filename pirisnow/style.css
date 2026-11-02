@@ -89,5 +89,18 @@ td.neu{font-weight:700;color:var(--obaga)}
 .barra:hover{color:#fff}
 .barra span{flex:1;font-weight:600;font-size:15px}
 .barra .barra-boto{flex:0 0 auto;background:#fff;color:var(--nit);border-radius:999px;padding:8px 14px;font-size:14px}
+.boto-fosc{background:var(--obaga);color:#fff}.boto-fosc:hover{background:var(--nit);color:#fff}
+.targetes-sec{padding-right:0}
+.targetes{list-style:none;margin:0;padding:0 20px 6px 0;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.targetes li{flex:0 0 220px;scroll-snap-align:start}
+.targetes a{display:block;text-decoration:none;color:var(--text);background:var(--neu);border-radius:14px;overflow:hidden;height:100%}
+.targetes img{display:block;width:100%;height:120px;object-fit:cover}
+.targetes .nom{display:block;font:600 16px Sora,sans-serif;color:var(--nit);padding:10px 12px 0}
+.targetes .dada{display:block;font-size:14px;color:var(--suau);padding:2px 12px 12px}
+.webcams li{display:flex;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--gel)}
+.webcams li:last-child{border-bottom:0}
+.webcams li a:first-child{flex:1 1 260px;border-bottom:0}
+.webcams .sub{font-size:14px;color:var(--suau);text-decoration:none;display:flex;align-items:center;gap:6px;padding:0 4px 10px}
+@media (min-width:600px){.webcams .sub{padding:12px 4px}}
 @media (min-width:880px){.barra{display:none}.peu{padding-bottom:24px}}
 @media (max-width:600px){.cta{flex-direction:column;gap:8px}.cta-simbol .simbol{width:48px}}
