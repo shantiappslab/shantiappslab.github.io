@@ -5,4 +5,3 @@ Sitemap: https://shantiappslab.github.io/bolets/sitemap.xml
 Sitemap: https://shantiappslab.github.io/setas/sitemap.xml
 Sitemap: https://shantiappslab.github.io/funghi/sitemap.xml
 Sitemap: https://shantiappslab.github.io/champignons/sitemap.xml
-Sitemap: https://shantiappslab.github.io/pirisnow/sitemap.xml
