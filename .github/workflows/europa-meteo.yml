@@ -1,0 +1,63 @@
+# BORRADOR (no activo). Va en shantiappslab.github.io/.github/workflows/europa-meteo.yml, como los 4 trabajos de meteo
+# que ya existen (bolets, setas, champignons, funghi). Copiar antes a ese repo (ver README.md de europa/meteo):
+#   europa/genera_meteo.py, europa/grib_min.py, europa/pesos_regions.npz
+# Una vez al día descarga lo necesario de ECMWF Open Data (CC BY 4.0) y DWD ICON-EU (CC BY 4.0), calcula la
+# humedad del suelo con el balance de agua y publica SOLO europa/meteo_<ISO2>.json y europa/meteo_manifest.json
+# (resumen para el índice + previsión de 5 días, ~80 KB gzip al día). La app los lee de
+# https://raw.githubusercontent.com/shantiappslab/shantiappslab.github.io/main/europa/meteo_<ISO2>.json
+# (y de https://shantiappslab.github.io/europa/meteo_<ISO2>.json).
+# El estado (~100 días por región, ~2 MB) va en la caché de Actions, no en git. Si se pierde, la tarea lo rehace desde
+# el archivo público de ECMWF en Google Cloud (~25 min; la serie de DWD se rehace en 30 días).
+# Paquetes que instala en el runner: numpy, imagecodecs (más las acciones oficiales checkout, setup-python y cache).
+name: Europa - meteo (ECMWF y DWD)
+
+on:
+  schedule:
+    - cron: "35 9 * * *"   # la pasada de las 00 UTC de ECMWF está completa (hasta +144 h) hacia las 08:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: europa-meteo      # propio: no se mezcla con bolets-, setas-, champignons- ni funghi-meteo
+  cancel-in-progress: false
+
+jobs:
+  meteo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar paquetes
+        run: python -m pip install numpy==2.2.6 imagecodecs==2025.3.30
+      - name: Recuperar el estado acumulado
+        uses: actions/cache/restore@v4
+        with:
+          path: europa/estado_meteo.npz
+          key: europa-meteo-estado-${{ github.run_id }}
+          restore-keys: europa-meteo-estado-
+      - name: Descargar y resumir (ECMWF y DWD)
+        run: python -E -X utf8 europa/genera_meteo.py --salida europa --estado europa/estado_meteo.npz --pesos europa/pesos_regions.npz
+      - name: Guardar el estado acumulado
+        uses: actions/cache/save@v4
+        with:
+          path: europa/estado_meteo.npz
+          key: europa-meteo-estado-${{ github.run_id }}
+      - name: Publicar los JSON de europa/
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add europa/meteo_*.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios"
+          else
+            git commit -m "Europa: meteo ECMWF y DWD $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3 4; do
+              git pull --rebase && git push && break
+              echo "Reintento $i"; sleep $((i * 7))
+            done
+          fi
