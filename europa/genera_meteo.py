@@ -402,7 +402,8 @@ def main():
     ok_p, ok_t = np.isfinite(P[-1]).mean(), np.isfinite(TX[-1]).mean()
     if ok_p < 0.99 or ok_t < 0.99:
         raise RuntimeError(f"Demasiadas regiones sin dato hoy (lluvia {ok_p:.2%}, temperatura {ok_t:.2%})")
-    if np.nanmin(TN[-1]) < -60 or np.nanmax(TX[-1]) > 55 or np.nanmax(P[-1]) > 600:
+    # -75 (antes -60): con EE. UU. y Canadá, la media regional de la mínima en Nunavut, Yukón o Alaska puede bajar de -60 en invierno
+    if np.nanmin(TN[-1]) < -75 or np.nanmax(TX[-1]) > 55 or np.nanmax(P[-1]) > 600:
         raise RuntimeError("Valores fuera de rango, no se publica")
 
     def lista(v, nd_):
